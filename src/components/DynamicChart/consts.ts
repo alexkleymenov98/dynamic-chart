@@ -47,7 +47,6 @@ export const POSITION_Y_SCALE = new Map<number, number[][]>([
 
 
 export const DEFAULT_Y_AXIS: EChartsOption['yAxis'] = {
-    alignTicks: true,
     position: 'left',
     type: 'value',
     nameLocation: 'end',
