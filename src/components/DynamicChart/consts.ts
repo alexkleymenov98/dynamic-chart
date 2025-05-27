@@ -1,9 +1,9 @@
-import type { EChartsOption } from 'echarts'
-import type { IDynamicChartOptions } from './types.ts';
+import type {EChartsOption} from 'echarts'
+import type {IDynamicChartOptions, TAxisYCoordinate, TAxisYLength, TInternalSetting} from './types.ts';
 
 export const STEP_VALUE = 50
-// todo: переименовать number в что-то осмысленное до конца файла
-export const POSITION_Y_LABEL = new Map<number, number[][]>([
+
+export const POSITION_Y_LABEL = new Map<TAxisYLength, TAxisYCoordinate>([
     [1, [
         [0, 40],
     ]],
@@ -24,7 +24,7 @@ export const POSITION_Y_LABEL = new Map<number, number[][]>([
     ]],
 ])
 
-export const POSITION_Y_SCALE = new Map<number, number[][]>([
+export const POSITION_Y_SCALE = new Map<TAxisYLength, TAxisYCoordinate>([
     [1, [
         [0, 20],
     ]],
@@ -55,8 +55,8 @@ export const DEFAULT_Y_AXIS: EChartsOption['yAxis'] = {
     nameTextStyle: {
         align: 'right', // Выравнивание для вертикального текста
     },
-    axisLine: { onZero: false },
-    axisLabel: { show: false },
+    axisLine: {onZero: false},
+    axisLabel: {show: false},
     axisPointer: {
         show: true,
     },
@@ -70,12 +70,12 @@ export const DEFAULT_Y_ZOOM: Partial<EChartsOption['dataZoom']> = {
         show: true
     },
     dataBackground: {
-        areaStyle: { opacity: 0 },
-        lineStyle: { opacity: 0 }
+        areaStyle: {opacity: 0},
+        lineStyle: {opacity: 0}
     },
     selectedDataBackground: {
-        areaStyle: { opacity: 0 },
-        lineStyle: { opacity: 0 }
+        areaStyle: {opacity: 0},
+        lineStyle: {opacity: 0}
     },
     width: 15,
     minSpan: 20,
@@ -95,8 +95,7 @@ export const DEFAULT_Y_ZOOM: Partial<EChartsOption['dataZoom']> = {
     }
 }
 
-// todo: тут тоже переименовать number
-const defaultMoreThenIntervalMonth: Record<number, number> = { // todo: defaultMoreThenIntervalMonth название не очень информативное
+const DEFAULT_INTERVAL_FOR_AXIS_X: TInternalSetting = {
     10: 4,
     3: 2,
     1: 1
@@ -107,5 +106,5 @@ export const DEFAULT_CHART_OPTIONS: Required<IDynamicChartOptions> = {
     chartHeight: 350,
     syncTooltip: true,
     syncZoom: true,
-    intervalSetting: defaultMoreThenIntervalMonth
+    intervalSetting: DEFAULT_INTERVAL_FOR_AXIS_X
 }

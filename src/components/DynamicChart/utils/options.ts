@@ -1,6 +1,6 @@
-import type { EChartsOption } from 'echarts';
-import type { IDynamicChartData, IDynamicChartOptions } from '../types.ts';
-import { DEFAULT_Y_AXIS, DEFAULT_Y_ZOOM, POSITION_Y_LABEL, POSITION_Y_SCALE, STEP_VALUE } from '../consts.ts';
+import type {EChartsOption} from 'echarts';
+import type {IDynamicChartData, IDynamicChartOptions, TAxisYLength} from '../types.ts';
+import {DEFAULT_Y_AXIS, DEFAULT_Y_ZOOM, POSITION_Y_LABEL, POSITION_Y_SCALE, STEP_VALUE} from '../consts.ts';
 
 
 export const generateDynamicOption = (params: IDynamicChartData, options: IDynamicChartOptions): EChartsOption => {
@@ -34,7 +34,7 @@ export const generateDynamicOption = (params: IDynamicChartData, options: IDynam
 }
 
 const generateYAxis = (params: IDynamicChartData): EChartsOption['yAxis'] => {
-    const { yAxis } = params
+    const {yAxis} = params
 
     if (yAxis) {
         const yAxisArray: EChartsOption['yAxis'] = []
@@ -48,7 +48,7 @@ const generateYAxis = (params: IDynamicChartData): EChartsOption['yAxis'] => {
 
                 const isPositionRight = i === 1 || i === 2
 
-                const offset = getOffsetPositionLabelYOnIndex(i, yAxis.length)
+                const offset = getOffsetPositionLabelYOnIndex(i, yAxis.length as TAxisYLength)
 
                 if (typeof currentYAxis === 'object') {
                     yAxisArray.push({
@@ -64,7 +64,7 @@ const generateYAxis = (params: IDynamicChartData): EChartsOption['yAxis'] => {
         return yAxisArray
     }
 
-    return [{ ...DEFAULT_Y_AXIS, position: 'left' }]
+    return [{...DEFAULT_Y_AXIS, position: 'left'}]
 }
 
 const generateGrid = (params: IDynamicChartData, options: IDynamicChartOptions): EChartsOption['grid'] => {
@@ -72,13 +72,13 @@ const generateGrid = (params: IDynamicChartData, options: IDynamicChartOptions):
 
     let bottom = 100
 
-    const { showSliderX } = options
+    const {showSliderX} = options
 
     if (showSliderX) {
         bottom = 140
     }
 
-    const { yAxis } = params
+    const {yAxis} = params
 
     if (!yAxis || !Array.isArray(yAxis) || yAxis.length === 1) {
         return {
@@ -134,10 +134,10 @@ const generateDataZoom = (params: IDynamicChartData, options?: IDynamicChartOpti
         },)
     }
 
-    const { yAxis } = params
+    const {yAxis} = params
 
     if (!yAxis) {
-        result.push({ ...DEFAULT_Y_ZOOM, yAxisIndex: [0], left: 0 })
+        result.push({...DEFAULT_Y_ZOOM, yAxisIndex: [0], left: 0})
     }
 
     if (yAxis && Array.isArray(yAxis)) {
@@ -145,7 +145,7 @@ const generateDataZoom = (params: IDynamicChartData, options?: IDynamicChartOpti
             result.push({
                 ...DEFAULT_Y_ZOOM,
                 id: `dataZoomY__slider-${i}`,
-                yAxisIndex: [i], ...getPositionOnIndex(i, yAxis.length)
+                yAxisIndex: [i], ...getPositionOnIndex(i, yAxis.length as TAxisYLength)
             })
         }
     }
@@ -153,7 +153,7 @@ const generateDataZoom = (params: IDynamicChartData, options?: IDynamicChartOpti
     return result
 }
 
-export const getPositionOnIndex = (index: number, len: number): Record<'right', number> | Record<'left', number> => {
+export const getPositionOnIndex = (index: number, len: TAxisYLength): Record<'right', number> | Record<'left', number> => {
     const valueArray = POSITION_Y_SCALE.get(len) ?? [0, 0, 0, 0]
 
 
@@ -162,13 +162,13 @@ export const getPositionOnIndex = (index: number, len: number): Record<'right', 
     const value = values[1]
 
     if (index === 0 || index === 3) {
-        return { left: value }
+        return {left: value}
     }
 
-    return { right: value }
+    return {right: value}
 }
 
-const getOffsetPositionLabelYOnIndex = (index: number, len: number) => {
+const getOffsetPositionLabelYOnIndex = (index: number, len: TAxisYLength) => {
     const valuesFromMap = POSITION_Y_LABEL.get(len) ?? [0, 0, 0, 0]
 
     const values: [number, number] = valuesFromMap[index] as [number, number] ?? [0, 0]
@@ -176,16 +176,15 @@ const getOffsetPositionLabelYOnIndex = (index: number, len: number) => {
     return values[1]
 }
 
-// todo: привести нейминг интерфейсов к одному виду, с I или без вначале
-interface GenerateOptionsAxisXProps {
+interface IGenerateOptionsAxisXProps {
     data?: string[]
     interval?: number
 }
 
-export const generateOptionsAxisX = ({ data, interval }: GenerateOptionsAxisXProps): EChartsOption['xAxis'] => ({
+export const generateOptionsAxisX = ({data, interval}: IGenerateOptionsAxisXProps): EChartsOption['xAxis'] => ({
     type: 'category',
     data,
-    axisLine: { onZero: false },
+    axisLine: {onZero: false},
     axisLabel: {
         rotate: 90,
         interval: interval,

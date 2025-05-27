@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { type ReactElement, type ReactNode, useRef, useState } from 'react';
+import {type ReactElement, type ReactNode, useRef, useState} from 'react';
 
-import type { EChartsType } from 'echarts/core';
-import { init, use as echartsUse } from 'echarts/core';
-import type { ECElementEvent, EChartsOption } from 'echarts';
+import type {EChartsType} from 'echarts/core';
+import {init, use as echartsUse} from 'echarts/core';
+import type {ECElementEvent, EChartsOption} from 'echarts';
 import {
     DataZoomComponent,
     DataZoomInsideComponent,
@@ -13,13 +13,13 @@ import {
     TitleComponent,
     TooltipComponent,
 } from 'echarts/components';
-import { BarChart, LineChart } from 'echarts/charts';
-import { CanvasRenderer } from 'echarts/renderers';
-import { generateDynamicOption, generateOptionsAxisX } from './utils/options.ts';
-import { calcInterval } from './utils/calcInterval.ts';
+import {BarChart, LineChart} from 'echarts/charts';
+import {CanvasRenderer} from 'echarts/renderers';
+import {generateDynamicOption, generateOptionsAxisX} from './utils/options.ts';
+import {calcInterval} from './utils/calcInterval.ts';
 import './DynamicChart.css'
-import { DEFAULT_CHART_OPTIONS } from './consts.ts';
-import type { IDataZoomParams, IDynamicChartData, IDynamicChartOptions } from './types.ts';
+import {DEFAULT_CHART_OPTIONS} from './consts.ts';
+import type {IDataZoomParams, IDynamicChartData, IDynamicChartOptions} from './types.ts';
 
 echartsUse([
     TitleComponent,
@@ -42,18 +42,18 @@ export interface IDynamicChartProps {
 }
 
 export const DynamicChart = React.forwardRef<HTMLDivElement, IDynamicChartProps>(
-    ({ render, data, options: _options = {} }, ref) => {
+    ({render, data, options: _options = {}}, ref) => {
         const intervalRef = useRef(0)
 
         const [chartNodes] = useState<ReactElement[]>(() => {
-            const options = { ...DEFAULT_CHART_OPTIONS, ..._options }
-            const { chartHeight, syncZoom, syncTooltip, intervalSetting } = options
+            const options = {...DEFAULT_CHART_OPTIONS, ..._options}
+            const {chartHeight, syncZoom, syncTooltip, intervalSetting} = options
             const chartInstances: EChartsType[] = [];
 
             return data.map((config) => {
-                const { xData, yData, name } = config
+                const {xData, yData, name} = config
 
-                return <div className="dynamic-chart" style={{ height: `${chartHeight}px` }} ref={instance => {
+                return <div className="dynamic-chart" style={{height: `${chartHeight}px`}} ref={instance => {
                     const myChart = init(instance);
                     chartInstances.push(myChart)
 
@@ -65,7 +65,7 @@ export const DynamicChart = React.forwardRef<HTMLDivElement, IDynamicChartProps>
                         },
                         tooltip: {
                             trigger: 'axis',
-                            axisPointer: { type: 'cross' }
+                            axisPointer: {type: 'cross'}
                         },
                         xAxis: generateOptionsAxisX({
                             data: xData,
@@ -124,7 +124,7 @@ export const DynamicChart = React.forwardRef<HTMLDivElement, IDynamicChartProps>
                                         start,
                                         end,
                                         dataZoomIndex: 0,
-                                    }, { silent: true });
+                                    }, {silent: true});
                                 }
                             });
                         }
@@ -137,7 +137,7 @@ export const DynamicChart = React.forwardRef<HTMLDivElement, IDynamicChartProps>
                                         data: xData,
                                         interval
                                     })
-                                }, { replaceMerge: ['xAxis'] });
+                                }, {replaceMerge: ['xAxis']});
                         }
                     });
 
@@ -145,12 +145,12 @@ export const DynamicChart = React.forwardRef<HTMLDivElement, IDynamicChartProps>
                     myChart.on('hideTip', function () {
                         chartInstances.forEach(targetChart => {
                             if (targetChart !== myChart) {
-                                targetChart.dispatchAction({ type: 'hideTip' }, { silent: true });
+                                targetChart.dispatchAction({type: 'hideTip'}, {silent: true});
                                 targetChart.dispatchAction({
                                     type: 'updateAxisPointer',
                                     x: -100, // Уводим за пределы графика
                                     y: -100
-                                }, { silent: true });
+                                }, {silent: true});
                             }
                         })
                     })
@@ -163,7 +163,7 @@ export const DynamicChart = React.forwardRef<HTMLDivElement, IDynamicChartProps>
                                             type: 'showTip',
                                             seriesIndex: 0,
                                             dataIndex: params.dataIndex
-                                        }, { silent: true });
+                                        }, {silent: true});
                                     }
                                 })
                             }

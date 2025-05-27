@@ -18,12 +18,18 @@ export interface IDynamicChartData {
     yAxis?: IDynamicChartYAxis[]
 }
 
+type TInternalYearsPeriod = number
+
+type TInternalCount = number
+
+export type TInternalSetting = Record<TInternalYearsPeriod, TInternalCount>
+
 export interface IDynamicChartOptions {
     showSliderX?: boolean
     chartHeight?: number
     syncTooltip?: boolean
     syncZoom?: boolean
-    intervalSetting?: Record<number, number> // todo: прояснить что за number number
+    intervalSetting?: TInternalSetting
 }
 
 export interface IDataZoomParams {
@@ -32,3 +38,7 @@ export interface IDataZoomParams {
     dataZoomId: string
     batch?: IDataZoomParams[]
 }
+
+export type TAxisYLength = 1 | 2 | 3 | 4
+
+export type TAxisYCoordinate = Array<[number, number]>
