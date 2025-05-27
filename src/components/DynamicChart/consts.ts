@@ -3,7 +3,7 @@ import type {IDynamicChartOptions } from "./types.ts";
 
 export const stepValue = 50
 
-export const POSITION_Y_LABEL = new Map([
+export const POSITION_Y_LABEL = new Map<number, number[][]>([
     [1,[
         [0, 40],
     ]],
@@ -24,7 +24,7 @@ export const POSITION_Y_LABEL = new Map([
     ]],
 ])
 
-export const POSITION_Y_SCALE = new Map([
+export const POSITION_Y_SCALE = new Map<number, number[][]>([
     [1,[
         [0, 20],
     ]],
@@ -64,10 +64,9 @@ export const defaultYAxis:EChartsOption['yAxis'] = {
     },
 }
 
-export const defaultYZoom:EChartsOption['dataZoom'] = {
+export const defaultYZoom:Partial<EChartsOption['dataZoom']> = {
     id: 'dataZoomY__slider',
     type: 'slider',
-    zoomOnMouseWheel: false,
     filterMode: 'none',
     handleLabel: {
         show: true

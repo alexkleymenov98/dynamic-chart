@@ -22,7 +22,7 @@ export const generateDynamicOption = (params:IDynamicChartData, options:IDynamic
             },
             itemWidth: 25,         // Ширина иконки
             itemHeight: 14,         // Высота иконки
-            left: params?.yAxis?.length > 3 ? stepValue * 2 : stepValue,
+            left: Array.isArray(params?.yAxis) && params?.yAxis?.length > 3 ? stepValue * 2 : stepValue,
             bottom: 0,
             type: 'scroll',        // Активирует прокрутку
             pageButtonItemGap: 5,  // Расстояние между кнопками
@@ -179,7 +179,7 @@ interface GenerateOptionsAxisXProps  {
     interval?: number
 }
 
-export const generateOptionsAxisX = ({data, interval}:GenerateOptionsAxisXProps)=>({
+export const generateOptionsAxisX = ({data, interval}:GenerateOptionsAxisXProps): EChartsOption['xAxis']=>({
     type: 'category',
     data,
     axisLine: { onZero: false },
