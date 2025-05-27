@@ -1,9 +1,9 @@
 import './App.css'
 
-import {DynamicChart} from './components/DynamicChart'
+import { DynamicChart } from './components/DynamicChart'
 
 const FROM_YEAR = 2000;
-const yearData = Array.from({ length:  10 }, (_v, year) => {
+const yearData = Array.from({ length: 10 }, (_v, year) => {
     return Array.from({ length: 12 }, (_v, month) => {
         return `01.${String(month + 1).padStart(2, '0')}.${year + FROM_YEAR}`
     })
@@ -16,7 +16,7 @@ const getRandomValues = (length: number) => {
 function App() {
     return <div style={{ width: '100%', height: '100%' }}>
         <DynamicChart
-            externalOptions={{
+            options={{
                 showSliderX: false,
                 chartHeight: 500,
                 syncZoom: true,
@@ -27,9 +27,9 @@ function App() {
                     1: 1
                 }
             }}
-            configs={[
+            data={[
                 {
-                    yAxis:[{
+                    yAxis: [{
                         id: 0,
                         name: 'Шкала 1'
                     }
@@ -37,11 +37,11 @@ function App() {
                     name: 'Добыча нефти',
                     xData: yearData,
                     yData: [
-                        {data:getRandomValues(yearData.length), name: 'Нефть', color: 'red', yAxisIndex: 0},
+                        { data: getRandomValues(yearData.length), name: 'Нефть', color: 'red', yAxisIndex: 0 },
                     ],
                 },
                 {
-                    yAxis:[{
+                    yAxis: [{
                         id: 0,
                         name: 'Шкала 1'
                     },
@@ -53,12 +53,12 @@ function App() {
                     name: 'Добыча воды',
                     xData: yearData,
                     yData: [
-                        {data:getRandomValues(yearData.length), name: 'Нефть', color: 'red', yAxisIndex: 0},
-                        {data:getRandomValues(yearData.length), name: 'Вода', color: 'blue', yAxisIndex: 1},
+                        { data: getRandomValues(yearData.length), name: 'Нефть', color: 'red', yAxisIndex: 0 },
+                        { data: getRandomValues(yearData.length), name: 'Вода', color: 'blue', yAxisIndex: 1 },
                     ],
                 },
                 {
-                    yAxis:[{
+                    yAxis: [{
                         id: 0,
                         name: 'Шкала 1'
                     },
@@ -74,13 +74,13 @@ function App() {
                     name: 'Добыча газа',
                     xData: yearData,
                     yData: [
-                        {data:getRandomValues(yearData.length), name: 'Нефть', color: 'red', yAxisIndex: 0},
-                        {data:getRandomValues(yearData.length), name: 'Вода', color: 'blue', yAxisIndex: 1},
-                        {data:getRandomValues(yearData.length), name: 'Газ', color: 'black', yAxisIndex: 2},
+                        { data: getRandomValues(yearData.length), name: 'Нефть', color: 'red', yAxisIndex: 0 },
+                        { data: getRandomValues(yearData.length), name: 'Вода', color: 'blue', yAxisIndex: 1 },
+                        { data: getRandomValues(yearData.length), name: 'Газ', color: 'black', yAxisIndex: 2 },
                     ],
                 },
                 {
-                    yAxis:[{
+                    yAxis: [{
                         id: 0,
                         name: 'Шкала 1'
                     },
@@ -100,17 +100,17 @@ function App() {
                     name: 'Добыча жидкости',
                     xData: yearData,
                     yData: [
-                        {data:getRandomValues(yearData.length), name: 'Нефть', color: 'red', yAxisIndex: 0},
-                        {data:getRandomValues(yearData.length), name: 'Вода', color: 'blue', yAxisIndex: 1},
-                        {data:getRandomValues(yearData.length), name: 'Газ', color: 'black', yAxisIndex: 2},
-                        {data:getRandomValues(yearData.length), name: 'Фосфор', color: 'yellow', yAxisIndex: 3},
+                        { data: getRandomValues(yearData.length), name: 'Нефть', color: 'red', yAxisIndex: 0 },
+                        { data: getRandomValues(yearData.length), name: 'Вода', color: 'blue', yAxisIndex: 1 },
+                        { data: getRandomValues(yearData.length), name: 'Газ', color: 'black', yAxisIndex: 2 },
+                        { data: getRandomValues(yearData.length), name: 'Фосфор', color: 'yellow', yAxisIndex: 3 },
                     ],
                 },
 
             ]}
             render={charts =>
                 (<div>{charts.map((chart, index) =>
-                    <div style={{marginBottom: '15px'}}
+                    <div style={{ marginBottom: '15px' }}
                          key={index}
                          children={chart}
                     />

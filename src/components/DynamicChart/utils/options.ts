@@ -1,31 +1,29 @@
-import type {EChartsOption} from "echarts";
-import type {IDynamicChartData, IDynamicChartOptions} from "../types.ts";
-import {defaultYAxis, defaultYZoom, POSITION_Y_LABEL, POSITION_Y_SCALE, stepValue} from "../consts.ts";
+import type { EChartsOption } from 'echarts';
+import type { IDynamicChartData, IDynamicChartOptions } from '../types.ts';
+import { DEFAULT_Y_AXIS, DEFAULT_Y_ZOOM, POSITION_Y_LABEL, POSITION_Y_SCALE, STEP_VALUE } from '../consts.ts';
 
 
-export const generateDynamicOption = (params:IDynamicChartData, options:IDynamicChartOptions):EChartsOption=>{
+export const generateDynamicOption = (params: IDynamicChartData, options: IDynamicChartOptions): EChartsOption => {
     return {
-        grid: {
-            ...generateGrid(params, options)
-        },
+        grid: generateGrid(params, options),
         yAxis: generateYAxis(params),
         dataZoom: generateDataZoom(params, options),
         legend: {
             textStyle: {
-                color: '#333',       // Цвет текста
+                color: '#333',          // Цвет текста
                 fontSize: 12,
                 fontWeight: 'bold'
             },
             itemStyle: {
-                borderWidth: 1,      // Граница иконок
+                borderWidth: 1,         // Граница иконок
                 borderColor: '#ccc'
             },
-            itemWidth: 25,         // Ширина иконки
-            itemHeight: 14,         // Высота иконки
-            left: Array.isArray(params?.yAxis) && params?.yAxis?.length > 3 ? stepValue * 2 : stepValue,
+            itemWidth: 25,              // Ширина иконки
+            itemHeight: 14,             // Высота иконки
+            left: Array.isArray(params?.yAxis) && params?.yAxis?.length > 3 ? STEP_VALUE * 2 : STEP_VALUE,
             bottom: 0,
-            type: 'scroll',        // Активирует прокрутку
-            pageButtonItemGap: 5,  // Расстояние между кнопками
+            type: 'scroll',             // Активирует прокрутку
+            pageButtonItemGap: 5,       // Расстояние между кнопками
             pageIconColor: '#2f4554',
             pageIconInactiveColor: '#aaa',
             pageTextStyle: {
@@ -35,54 +33,54 @@ export const generateDynamicOption = (params:IDynamicChartData, options:IDynamic
     }
 }
 
-const generateYAxis = (params:IDynamicChartData):EChartsOption['yAxis']=>{
-    const {yAxis} = params
+const generateYAxis = (params: IDynamicChartData): EChartsOption['yAxis'] => {
+    const { yAxis } = params
 
-    if(yAxis){
+    if (yAxis) {
         const yAxisArray: EChartsOption['yAxis'] = []
 
-        if(!Array.isArray(yAxis)){
+        if (!Array.isArray(yAxis)) {
             yAxisArray.push(yAxis)
         } else {
 
-          for(let i = 0; i < yAxis.length; i++){
-              const currentYAxis = yAxis[i]
+            for (let i = 0; i < yAxis.length; i++) {
+                const currentYAxis = yAxis[i]
 
-              const isPositionRight = i === 1 || i === 2
+                const isPositionRight = i === 1 || i === 2
 
-              const offset = getOffsetPositionLabelYOnIndex(i, yAxis.length)
+                const offset = getOffsetPositionLabelYOnIndex(i, yAxis.length)
 
-              if(typeof currentYAxis === 'object'){
-                  yAxisArray.push({
-                      ...defaultYAxis,
-                      position: isPositionRight ? 'right': 'left',
-                      offset,
-                      ...yAxis[i],
-                  })
-              }
-          }
+                if (typeof currentYAxis === 'object') {
+                    yAxisArray.push({
+                        ...DEFAULT_Y_AXIS,
+                        position: isPositionRight ? 'right' : 'left',
+                        offset,
+                        ...yAxis[i],
+                    })
+                }
+            }
         }
 
         return yAxisArray
     }
 
-    return [{...defaultYAxis, position: 'left'}]
+    return [{ ...DEFAULT_Y_AXIS, position: 'left' }]
 }
 
-const generateGrid = (params:IDynamicChartData, options:IDynamicChartOptions):EChartsOption['grid'] =>{
-    const step = stepValue
+const generateGrid = (params: IDynamicChartData, options: IDynamicChartOptions): EChartsOption['grid'] => {
+    const step = STEP_VALUE
 
     let bottom = 100
 
     const { showSliderX } = options
 
-    if(showSliderX){
+    if (showSliderX) {
         bottom = 140
     }
 
-    const {yAxis} = params
+    const { yAxis } = params
 
-    if(!yAxis || !Array.isArray(yAxis) || yAxis.length === 1){
+    if (!yAxis || !Array.isArray(yAxis) || yAxis.length === 1) {
         return {
             left: step,
             right: 0,
@@ -90,7 +88,7 @@ const generateGrid = (params:IDynamicChartData, options:IDynamicChartOptions):EC
         }
     }
 
-    if(yAxis.length === 2){
+    if (yAxis.length === 2) {
         return {
             left: step,
             right: step,
@@ -98,7 +96,7 @@ const generateGrid = (params:IDynamicChartData, options:IDynamicChartOptions):EC
         }
     }
 
-    if(yAxis.length === 3){
+    if (yAxis.length === 3) {
         return {
             left: step,
             right: step * 2,
@@ -114,7 +112,7 @@ const generateGrid = (params:IDynamicChartData, options:IDynamicChartOptions):EC
     }
 }
 
-const generateDataZoom = (params:IDynamicChartData, options?:IDynamicChartOptions):EChartsOption['dataZoom']=>{
+const generateDataZoom = (params: IDynamicChartData, options?: IDynamicChartOptions): EChartsOption['dataZoom'] => {
 
     const result: EChartsOption['dataZoom'] = [
         {
@@ -122,11 +120,11 @@ const generateDataZoom = (params:IDynamicChartData, options?:IDynamicChartOption
             type: 'inside',
             xAxisIndex: [0],
             filterMode: 'none',
-            minSpan:3,
+            minSpan: 3,
         },
     ]
 
-    if(options?.showSliderX){
+    if (options?.showSliderX) {
         result.push({
             id: 'dataZoomX__slider',
             type: 'slider',
@@ -136,50 +134,55 @@ const generateDataZoom = (params:IDynamicChartData, options?:IDynamicChartOption
         },)
     }
 
-    const {yAxis} = params
+    const { yAxis } = params
 
-    if(!yAxis) {
-        result.push({...defaultYZoom, yAxisIndex: [0],left: 0})
+    if (!yAxis) {
+        result.push({ ...DEFAULT_Y_ZOOM, yAxisIndex: [0], left: 0 })
     }
 
-    if(yAxis && Array.isArray(yAxis)){
-        for(let i = 0; i < yAxis.length; i++){
-            result.push({...defaultYZoom, id: `dataZoomY__slider-${i}`, yAxisIndex: [i],...getPositionOnIndex(i, yAxis.length)})
+    if (yAxis && Array.isArray(yAxis)) {
+        for (let i = 0; i < yAxis.length; i++) {
+            result.push({
+                ...DEFAULT_Y_ZOOM,
+                id: `dataZoomY__slider-${i}`,
+                yAxisIndex: [i], ...getPositionOnIndex(i, yAxis.length)
+            })
         }
     }
 
     return result
 }
 
-export const getPositionOnIndex = (index: number, len: number):Record<'right', number>|Record<'left', number>=>{
-    const valueArray = POSITION_Y_SCALE.get(len) ?? [0,0, 0,0]
+export const getPositionOnIndex = (index: number, len: number): Record<'right', number> | Record<'left', number> => {
+    const valueArray = POSITION_Y_SCALE.get(len) ?? [0, 0, 0, 0]
 
 
-    const values:[number, number] = valueArray[index] as [number, number] ?? [0,0]
+    const values: [number, number] = valueArray[index] as [number, number] ?? [0, 0]
 
     const value = values[1]
 
-    if(index === 0 || index === 3){
-        return  {left: value}
+    if (index === 0 || index === 3) {
+        return { left: value }
     }
 
-    return  {right: value}
+    return { right: value }
 }
 
-const getOffsetPositionLabelYOnIndex = (index: number, len: number)=>{
-    const valuesFromMap = POSITION_Y_LABEL.get(len) ?? [0,0,0,0]
+const getOffsetPositionLabelYOnIndex = (index: number, len: number) => {
+    const valuesFromMap = POSITION_Y_LABEL.get(len) ?? [0, 0, 0, 0]
 
-    const values:[number, number] = valuesFromMap[index] as [number, number] ?? [0,0]
+    const values: [number, number] = valuesFromMap[index] as [number, number] ?? [0, 0]
 
-    return  values[1]
+    return values[1]
 }
 
-interface GenerateOptionsAxisXProps  {
+// todo: привести нейминг интерфейсов к одному виду, с I или без вначале
+interface GenerateOptionsAxisXProps {
     data?: string[]
     interval?: number
 }
 
-export const generateOptionsAxisX = ({data, interval}:GenerateOptionsAxisXProps): EChartsOption['xAxis']=>({
+export const generateOptionsAxisX = ({ data, interval }: GenerateOptionsAxisXProps): EChartsOption['xAxis'] => ({
     type: 'category',
     data,
     axisLine: { onZero: false },

@@ -1,11 +1,8 @@
-import type {EChartsOption} from "echarts";
-
 export interface IDynamicChartYData {
     data: number[];
-    type?: 'line'| 'bar';
+    type?: 'line' | 'bar';
     name?: string;
     yAxisIndex?: number,
-    areaStyle?: Record<string, string>,
     color?: string
 }
 
@@ -18,7 +15,7 @@ export interface IDynamicChartData {
     xData: string[];
     yData: IDynamicChartYData[];
     name?: string
-    yAxis?:EChartsOption['yAxis'] | IDynamicChartYAxis[]
+    yAxis?: IDynamicChartYAxis[]
 }
 
 export interface IDynamicChartOptions {
@@ -26,5 +23,12 @@ export interface IDynamicChartOptions {
     chartHeight?: number
     syncTooltip?: boolean
     syncZoom?: boolean
-    intervalSetting?: Record<number, number>
+    intervalSetting?: Record<number, number> // todo: прояснить что за number number
+}
+
+export interface IDataZoomParams {
+    start: number
+    end: number
+    dataZoomId: string
+    batch?: IDataZoomParams[]
 }

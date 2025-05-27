@@ -1,22 +1,22 @@
-import type { EChartsOption } from "echarts"
-import type {IDynamicChartOptions } from "./types.ts";
+import type { EChartsOption } from 'echarts'
+import type { IDynamicChartOptions } from './types.ts';
 
-export const stepValue = 50
-
+export const STEP_VALUE = 50
+// todo: переименовать number в что-то осмысленное до конца файла
 export const POSITION_Y_LABEL = new Map<number, number[][]>([
-    [1,[
+    [1, [
         [0, 40],
     ]],
-    [2,[
+    [2, [
         [0, 40],
         [1, 10],
     ]],
-    [3,[
+    [3, [
         [0, 40],
         [1, 25],
         [2, 65],
     ]],
-    [4,[
+    [4, [
         [0, 90],
         [1, 25],
         [2, 65],
@@ -25,19 +25,19 @@ export const POSITION_Y_LABEL = new Map<number, number[][]>([
 ])
 
 export const POSITION_Y_SCALE = new Map<number, number[][]>([
-    [1,[
+    [1, [
         [0, 20],
     ]],
-    [2,[
+    [2, [
         [0, 20],
         [1, 15],
     ]],
-    [3,[
+    [3, [
         [0, 20],
         [1, 50],
         [2, 10],
     ]],
-    [4,[
+    [4, [
         [0, 20],
         [1, 50],
         [2, 10],
@@ -46,13 +46,12 @@ export const POSITION_Y_SCALE = new Map<number, number[][]>([
 ])
 
 
-
-export const defaultYAxis:EChartsOption['yAxis'] = {
+export const DEFAULT_Y_AXIS: EChartsOption['yAxis'] = {
     alignTicks: true,
     position: 'left',
     type: 'value',
     nameLocation: 'end',
-    nameGap:5,
+    nameGap: 5,
     nameRotate: 90,
     nameTextStyle: {
         align: 'right', // Выравнивание для вертикального текста
@@ -64,7 +63,7 @@ export const defaultYAxis:EChartsOption['yAxis'] = {
     },
 }
 
-export const defaultYZoom:Partial<EChartsOption['dataZoom']> = {
+export const DEFAULT_Y_ZOOM: Partial<EChartsOption['dataZoom']> = {
     id: 'dataZoomY__slider',
     type: 'slider',
     filterMode: 'none',
@@ -80,7 +79,7 @@ export const defaultYZoom:Partial<EChartsOption['dataZoom']> = {
         lineStyle: { opacity: 0 }
     },
     width: 15,
-    minSpan:20,
+    minSpan: 20,
     handleSize: '80%',
     handleStyle: {
         color: '#fff',
@@ -97,13 +96,14 @@ export const defaultYZoom:Partial<EChartsOption['dataZoom']> = {
     }
 }
 
-const defaultMoreThenIntervalMonth: Record<number, number> = {
+// todo: тут тоже переименовать number
+const defaultMoreThenIntervalMonth: Record<number, number> = { // todo: defaultMoreThenIntervalMonth название не очень информативное
     10: 4,
     3: 2,
     1: 1
 }
 
-export const defaultChartOptions:Required<IDynamicChartOptions> = {
+export const DEFAULT_CHART_OPTIONS: Required<IDynamicChartOptions> = {
     showSliderX: false,
     chartHeight: 350,
     syncTooltip: true,
