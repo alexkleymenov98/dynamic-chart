@@ -1,11 +1,11 @@
 import type {EChartsOption} from 'echarts';
-import type {IDynamicChartData, IDynamicChartOptions, TAxisYLength} from '../types.ts';
+import type {IDynamicChartData, IDynamicChartWithInnerOptions, TAxisYLength} from '../types.ts';
 import {DEFAULT_Y_AXIS, DEFAULT_Y_ZOOM, POSITION_Y_LABEL, POSITION_Y_SCALE, STEP_VALUE} from '../consts.ts';
 
 
-export const generateDynamicOption = (params: IDynamicChartData, options: IDynamicChartOptions): EChartsOption => {
+export const generateDynamicOption = (params: IDynamicChartData, options: IDynamicChartWithInnerOptions): EChartsOption => {
     return {
-        grid: generateGrid(params, options),
+        grid: generateGrid(options),
         yAxis: generateYAxis(params),
         dataZoom: generateDataZoom(params, options),
         legend: {
@@ -67,7 +67,7 @@ const generateYAxis = (params: IDynamicChartData): EChartsOption['yAxis'] => {
     return [{...DEFAULT_Y_AXIS, position: 'left'}]
 }
 
-const generateGrid = (params: IDynamicChartData, options: IDynamicChartOptions): EChartsOption['grid'] => {
+const generateGrid = (options: IDynamicChartWithInnerOptions): EChartsOption['grid'] => {
     const step = STEP_VALUE
 
     let bottom = 100
@@ -78,9 +78,9 @@ const generateGrid = (params: IDynamicChartData, options: IDynamicChartOptions):
         bottom = 140
     }
 
-    const {yAxis} = params
+    const length = options.yAxisMaxLength
 
-    if (!yAxis || !Array.isArray(yAxis) || yAxis.length === 1) {
+    if (length === 1) {
         return {
             left: step,
             right: 0,
@@ -88,7 +88,7 @@ const generateGrid = (params: IDynamicChartData, options: IDynamicChartOptions):
         }
     }
 
-    if (yAxis.length === 2) {
+    if (length === 2) {
         return {
             left: step,
             right: step,
@@ -96,7 +96,7 @@ const generateGrid = (params: IDynamicChartData, options: IDynamicChartOptions):
         }
     }
 
-    if (yAxis.length === 3) {
+    if (length === 3) {
         return {
             left: step,
             right: step * 2,
@@ -112,7 +112,7 @@ const generateGrid = (params: IDynamicChartData, options: IDynamicChartOptions):
     }
 }
 
-const generateDataZoom = (params: IDynamicChartData, options?: IDynamicChartOptions): EChartsOption['dataZoom'] => {
+const generateDataZoom = (params: IDynamicChartData, options?: IDynamicChartWithInnerOptions): EChartsOption['dataZoom'] => {
 
     const result: EChartsOption['dataZoom'] = [
         {
@@ -193,3 +193,4 @@ export const generateOptionsAxisX = ({data, interval}: IGenerateOptionsAxisXProp
         alignWithLabel: true
     }
 })
+

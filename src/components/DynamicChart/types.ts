@@ -32,6 +32,10 @@ export interface IDynamicChartOptions {
     intervalSetting?: TInternalSetting
 }
 
+export interface IDynamicChartWithInnerOptions extends IDynamicChartOptions {
+    yAxisMaxLength: number
+}
+
 export interface IDataZoomParams {
     start: number
     end: number
