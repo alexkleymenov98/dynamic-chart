@@ -106,7 +106,6 @@ function App() {
                         { data: getRandomValues(yearData.length), name: 'Фосфор', color: 'yellow', yAxisIndex: 3 },
                     ],
                 },
-
             ]}
             render={charts =>
                 (<div>{charts.map((chart, index) =>

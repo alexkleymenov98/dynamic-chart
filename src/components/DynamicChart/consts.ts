@@ -60,6 +60,7 @@ export const DEFAULT_Y_AXIS: EChartsOption['yAxis'] = {
     axisPointer: {
         show: true,
     },
+    show: false
 }
 
 export const DEFAULT_Y_ZOOM: Partial<EChartsOption['dataZoom']> = {
