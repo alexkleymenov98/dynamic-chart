@@ -1,5 +1,11 @@
 import type {EChartsOption} from 'echarts'
-import type {IDynamicChartOptions, TAxisYCoordinate, TAxisYLength, TInternalSetting} from './types.ts';
+import type {
+    IDynamicChartOptions,
+    IMinAndMaxValueYAxis,
+    TAxisYCoordinate,
+    TAxisYLength,
+    TInternalSetting
+} from './types.ts';
 
 export const STEP_VALUE = 50
 
@@ -79,6 +85,7 @@ export const DEFAULT_Y_ZOOM: Partial<EChartsOption['dataZoom']> = {
     },
     width: 15,
     minSpan: 20,
+    handleIcon: 'M10 10 A5 5 0 1 0 20 10 A5 5 0 1 0 10 10',
     handleSize: '80%',
     handleStyle: {
         color: '#fff',
@@ -107,4 +114,9 @@ export const DEFAULT_CHART_OPTIONS: Required<IDynamicChartOptions> = {
     syncTooltip: true,
     syncZoom: true,
     intervalSetting: DEFAULT_INTERVAL_FOR_AXIS_X
+}
+
+export const DEFAULT_MIN_MAX: IMinAndMaxValueYAxis = {
+    minValueY: 0,
+    maxValueY: 1000
 }

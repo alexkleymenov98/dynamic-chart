@@ -49,8 +49,11 @@ export const DynamicChart = React.forwardRef<HTMLDivElement, IDynamicChartProps>
         const [chartNodes] = useState<ReactElement[]>(() => {
             const yAxisMaxLength = getYAxisMaxCount(data)
 
-            const options: Required<IDynamicChartWithInnerOptions> = {...DEFAULT_CHART_OPTIONS, ..._options, yAxisMaxLength}
-            const {chartHeight, syncZoom, syncTooltip, intervalSetting } = options
+            const options: Required<IDynamicChartWithInnerOptions> = {
+                ...DEFAULT_CHART_OPTIONS, ..._options,
+                yAxisMaxLength
+            }
+            const {chartHeight, syncZoom, syncTooltip, intervalSetting} = options
             const chartInstances: EChartsType[] = [];
 
             return data.map((config) => {
@@ -59,6 +62,7 @@ export const DynamicChart = React.forwardRef<HTMLDivElement, IDynamicChartProps>
                 return <div className="dynamic-chart" style={{height: `${chartHeight}px`}} ref={instance => {
                     const myChart = init(instance);
                     chartInstances.push(myChart)
+
                     const dynamicOption = generateDynamicOption(config, options)
 
                     const option: EChartsOption = {
@@ -127,6 +131,13 @@ export const DynamicChart = React.forwardRef<HTMLDivElement, IDynamicChartProps>
                                         end,
                                         dataZoomIndex: 0,
                                     }, {silent: true});
+                                    targetChart.setOption(
+                                        {
+                                            xAxis: generateOptionsAxisX({
+                                                data: xData,
+                                                interval
+                                            })
+                                        }, {replaceMerge: ['xAxis']})
                                 }
                             });
                         }

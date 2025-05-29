@@ -1,13 +1,23 @@
-import type {EChartsOption} from 'echarts';
-import type {IDynamicChartData, IDynamicChartWithInnerOptions, TAxisYLength} from '../types.ts';
-import {DEFAULT_Y_AXIS, DEFAULT_Y_ZOOM, POSITION_Y_LABEL, POSITION_Y_SCALE, STEP_VALUE} from '../consts.ts';
+import type {DataZoomComponentOption, EChartsOption} from 'echarts';
+import type {IDynamicChartData, IDynamicChartWithInnerOptions, IMinAndMaxValueYAxis, TAxisYLength} from '../types.ts';
+import {
+    DEFAULT_MIN_MAX,
+    DEFAULT_Y_AXIS,
+    DEFAULT_Y_ZOOM,
+    POSITION_Y_LABEL,
+    POSITION_Y_SCALE,
+    STEP_VALUE
+} from '../consts.ts';
+import {calcMaxAndMinForYAxis} from "./calcMaxAndMinForYAxis.ts";
 
 
 export const generateDynamicOption = (params: IDynamicChartData, options: IDynamicChartWithInnerOptions): EChartsOption => {
+    const minAndMaxValueY = calcMaxAndMinForYAxis(params)
+
     return {
         grid: generateGrid(options),
-        yAxis: generateYAxis(params),
-        dataZoom: generateDataZoom(params, options),
+        yAxis: generateYAxis(params, options, minAndMaxValueY),
+        dataZoom: generateDataZoom(params, options, minAndMaxValueY),
         legend: {
             textStyle: {
                 color: '#333',          // Цвет текста
@@ -20,7 +30,7 @@ export const generateDynamicOption = (params: IDynamicChartData, options: IDynam
             },
             itemWidth: 25,              // Ширина иконки
             itemHeight: 14,             // Высота иконки
-            left: Array.isArray(params?.yAxis) && params?.yAxis?.length > 3 ? STEP_VALUE * 2 : STEP_VALUE,
+            left: options.yAxisMaxLength > 3 ? STEP_VALUE * 2 : STEP_VALUE,
             bottom: 0,
             type: 'scroll',             // Активирует прокрутку
             pageButtonItemGap: 5,       // Расстояние между кнопками
@@ -33,7 +43,7 @@ export const generateDynamicOption = (params: IDynamicChartData, options: IDynam
     }
 }
 
-const generateYAxis = (params: IDynamicChartData): EChartsOption['yAxis'] => {
+const generateYAxis = (params: IDynamicChartData, options: IDynamicChartWithInnerOptions, yMinAndMax: IMinAndMaxValueYAxis): EChartsOption['yAxis'] => {
     const {yAxis} = params
 
     if (yAxis) {
@@ -48,7 +58,7 @@ const generateYAxis = (params: IDynamicChartData): EChartsOption['yAxis'] => {
 
                 const isPositionRight = i === 1 || i === 2
 
-                const offset = getOffsetPositionLabelYOnIndex(i, yAxis.length as TAxisYLength)
+                const offset = getOffsetPositionLabelYOnIndex(i, options.yAxisMaxLength as TAxisYLength)
 
                 if (typeof currentYAxis === 'object') {
                     yAxisArray.push({
@@ -56,6 +66,8 @@ const generateYAxis = (params: IDynamicChartData): EChartsOption['yAxis'] => {
                         position: isPositionRight ? 'right' : 'left',
                         offset,
                         ...yAxis[i],
+                        min: yMinAndMax.minValueY,
+                        max: yMinAndMax.maxValueY,
                     })
                 }
             }
@@ -112,7 +124,16 @@ const generateGrid = (options: IDynamicChartWithInnerOptions): EChartsOption['gr
     }
 }
 
-const generateDataZoom = (params: IDynamicChartData, options?: IDynamicChartWithInnerOptions): EChartsOption['dataZoom'] => {
+const generateDataZoom = (params: IDynamicChartData, options: IDynamicChartWithInnerOptions, yMinAndMax: IMinAndMaxValueYAxis): EChartsOption['dataZoom'] => {
+    const PERCENT_START = 32;
+    const PERCENT_END =  68
+
+    const positionZoomForScale: Partial<Pick<DataZoomComponentOption, 'start' | 'end'>> = {}
+
+    if (yMinAndMax.maxValueY !== DEFAULT_MIN_MAX.maxValueY || yMinAndMax.minValueY !== DEFAULT_MIN_MAX.minValueY) {
+        positionZoomForScale.start = PERCENT_START;
+        positionZoomForScale.end = PERCENT_END;
+    }
 
     const result: EChartsOption['dataZoom'] = [
         {
@@ -137,15 +158,16 @@ const generateDataZoom = (params: IDynamicChartData, options?: IDynamicChartWith
     const {yAxis} = params
 
     if (!yAxis) {
-        result.push({...DEFAULT_Y_ZOOM, yAxisIndex: [0], left: 0})
+        result.push({...DEFAULT_Y_ZOOM, ...positionZoomForScale, yAxisIndex: [0], left: 0})
     }
 
     if (yAxis && Array.isArray(yAxis)) {
         for (let i = 0; i < yAxis.length; i++) {
             result.push({
                 ...DEFAULT_Y_ZOOM,
+                ...positionZoomForScale,
                 id: `dataZoomY__slider-${i}`,
-                yAxisIndex: [i], ...getPositionOnIndex(i, yAxis.length as TAxisYLength)
+                yAxisIndex: [i], ...getPositionOnIndex(i, options.yAxisMaxLength as TAxisYLength)
             })
         }
     }

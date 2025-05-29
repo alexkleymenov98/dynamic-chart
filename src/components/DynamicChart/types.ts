@@ -32,7 +32,13 @@ export interface IDynamicChartOptions {
     intervalSetting?: TInternalSetting
 }
 
-export interface IDynamicChartWithInnerOptions extends IDynamicChartOptions {
+
+export interface IMinAndMaxValueYAxis {
+    minValueY: number
+    maxValueY: number
+}
+
+export interface IDynamicChartWithInnerOptions extends Required<IDynamicChartOptions> {
     yAxisMaxLength: number
 }
 
