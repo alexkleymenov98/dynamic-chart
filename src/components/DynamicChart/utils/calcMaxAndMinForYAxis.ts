@@ -1,44 +1,34 @@
-import type {IDynamicChartData, IMinAndMaxValueYAxis} from "../types.ts";
-import {DEFAULT_MIN_MAX} from "../consts.ts";
+import type { IDynamicChartData, IMinAndMaxValueYAxis } from '../DynamicChart.types.ts';
+import { DEFAULT_MIN_MAX } from '../DynamicChart.const.ts';
 
+export function calcMaxAndMinForYAxis(data: IDynamicChartData): IMinAndMaxValueYAxis {
+  const xDateLength = data.xData.length ?? 0;
 
-export const calcMaxAndMinForYAxis = (data: IDynamicChartData): IMinAndMaxValueYAxis => {
-    const xDateLength = data.xData.length ?? 0
+  if (!xDateLength) {
+    return DEFAULT_MIN_MAX;
+  }
 
-    if (!xDateLength) {
-        return DEFAULT_MIN_MAX
-    }
+  let minValue: number | null = null;
+  let maxValue: number | null = null;
 
-    let minValue = null;
-    let maxValue = null;
+  const yData = data.yData;
 
-    const yData = data.yData;
+  yData.forEach((lines) => {
+    lines.data.forEach((value) => {
+      if (!maxValue || value > maxValue) {
+        maxValue = value;
+      }
 
-    for (let i = 0; i < yData.length; i++) {
-        const lines = yData[i]
+      if (!minValue || value < minValue) {
+        minValue = value;
+      }
+    });
+  });
 
-        for (let j = 0; j < lines.data.length; j++) {
-            const value = lines.data[j]
+  const delta = Number(maxValue) - Number(minValue);
 
-            if (!maxValue) {
-                maxValue = value
-            } else if (value > maxValue) {
-                maxValue = value
-            }
-
-            if (!minValue) {
-                minValue = value
-            } else if (value < minValue) {
-                minValue = value
-            }
-
-        }
-    }
-
-    const delta = Number(maxValue) - Number(minValue)
-
-    return {
-        minValueY: Number(minValue) - delta,
-        maxValueY: Number(maxValue) + delta
-    }
+  return {
+    minValueY: Number(minValue) - delta,
+    maxValueY: Number(maxValue) + delta,
+  };
 }

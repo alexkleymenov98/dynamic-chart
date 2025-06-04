@@ -1,1 +1,1 @@
-export { type IDynamicChartProps, DynamicChart } from './DynamicChart';
+export { DynamicChart, type IDynamicChartProps } from './DynamicChart';

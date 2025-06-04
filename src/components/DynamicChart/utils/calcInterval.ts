@@ -1,19 +1,20 @@
-import type {TInternalSetting} from "../types.ts";
+import type { TInternalSetting } from '../DynamicChart.types';
 
-export const calcInterval = (xAxisDiffInMonth: number, setting: TInternalSetting) => {
-    const countMonthForYear = 12
-    const months = Object.keys(setting)
-        .map((year) => Number(year) * countMonthForYear)
-        .sort((a, b) => a < b ? 1 : -1)
+export function calcInterval(xAxisDiffInMonth: number, setting: TInternalSetting) {
+  const countMonthForYear = 12;
+  const months = Object.keys(setting)
+    .map(year => Number(year) * countMonthForYear)
+    .sort((a, b) => a < b ? 1 : -1);
 
-    for (let i = 0; i < months.length; i++) {
-        const countMonths = months[i]
-        if (xAxisDiffInMonth >= countMonths) {
-            const year = countMonths / countMonthForYear
+  let interval = 0
 
-            return setting[year]
-        }
+  months.forEach((countMonths) => {
+    if (xAxisDiffInMonth >= countMonths) {
+      const year = countMonths / countMonthForYear;
+
+      interval = setting[year];
     }
+  });
 
-    return 0
+  return interval;
 }
