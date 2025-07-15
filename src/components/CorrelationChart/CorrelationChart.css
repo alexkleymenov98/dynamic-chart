@@ -1,0 +1,11 @@
+.correlation-chart {
+    border-radius: 10px;
+    background-color: #cccccc;
+    display: flex;
+    padding-top: 15px;
+}
+
+.correlation-between-chart {
+    display: flex;
+    padding-top: 15px;
+}

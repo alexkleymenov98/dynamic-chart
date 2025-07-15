@@ -3,6 +3,7 @@ import './App.css'
 import {DynamicChart} from './components/DynamicChart'
 import {type ChangeEvent, useCallback, useMemo, useState} from "react";
 import {useDownloadToPng} from "./hooks/useDownloadToPng.ts";
+import {CorrelationWrapper} from "./components/CorrelationChart/CorrelationWrapper.tsx";
 
 const FROM_YEAR = 2000;
 const yearData = Array.from({length: 10}, (_v, year) => {
@@ -115,7 +116,7 @@ function App() {
         0: false,
         1: false,
         2: false,
-        3: true,
+        3: false,
     });
 
     const onChangeEvent = useCallback((event: ChangeEvent<HTMLInputElement>) => {
@@ -134,18 +135,19 @@ function App() {
         <label htmlFor="2"><input id="2" onChange={onChangeEvent} type='checkbox'/> Добыча газа</label>
         <label htmlFor="3"><input id="3" onChange={onChangeEvent} type='checkbox'/> Добыча жидкости</label>
         <button onClick={onDownloadToPNG}>Скачать PNG</button>
-        <DynamicChart
-            ref={elementRef}
-            memoizeOptions={momoizeOption}
-            data={filtredData}
-            render={charts =>
-                (<div>{charts.map((chart, index) =>
-                    <div style={{marginBottom: '15px'}}
-                         key={index}
-                         children={chart}
-                    />
-                )}</div>)}
-        />
+        {/*<DynamicChart*/}
+        {/*    ref={elementRef}*/}
+        {/*    memoizeOptions={momoizeOption}*/}
+        {/*    data={filtredData}*/}
+        {/*    render={charts =>*/}
+        {/*        (<div>{charts.map((chart, index) =>*/}
+        {/*            <div style={{marginBottom: '15px'}}*/}
+        {/*                 key={index}*/}
+        {/*                 children={chart}*/}
+        {/*            />*/}
+        {/*        )}</div>)}*/}
+        {/*/>*/}
+        <CorrelationWrapper/>
     </div>
 }
 

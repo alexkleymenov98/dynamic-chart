@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Литологический разрез</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        #chart-container {
+            width: 1000px;
+            height: 700px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+<div id="chart-container"></div>
+<script>
+    const chartDom = document.getElementById('chart-container');
+    const myChart = echarts.init(chartDom);
+
+    // Данные из таблицы (адаптированные)
+    const depthData = [
+        { a_o: 1540, depth: 1687,   gk: 10, nk: 0.5, ps: 44, lithology: 'Кровля ПК', saturation: 'Джурорд' },
+        { a_o: 1560, depth: 1712.2, gk: null, nk: null, ps: null, lithology: '', saturation: '' },
+        // ... остальные данные
+    ];
+
+    // Цвета для литологии
+    const lithologyColors = {
+        'Кровля ПК': '#a0522d',
+        'Джурорд': '#4682b4',
+        // ... другие типы пород
+    };
+
+    const option = {
+        title: {
+            text: 'Литологический разрез скважины',
+            left: 'center'
+        },
+        tooltip: {
+            trigger: 'axis',
+            formatter: function(params) {
+                const data = params[0].data;
+                return [
+                    `Глубина: ${data.depth} м`,
+                    `A.O.: ${data.a_o}`,
+                    `ГК: ${data.gk || '-'}`,
+                    `НК: ${data.nk || '-'}`,
+                    `ПС: ${data.ps || '-'}`,
+                    `Литология: ${data.lithology || '-'}`,
+                    `Насыщение: ${data.saturation || '-'}`
+                ].join('<br>');
+            }
+        },
+        legend: {
+            data: ['ГК', 'НК', 'ПС', 'Литология'],
+            top: 30
+        },
+        grid: {
+            left: '10%',
+            right: '10%',
+            bottom: '15%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'value',
+            name: 'Значения',
+            position: 'top'
+        },
+        yAxis: {
+            type: 'category',
+            name: 'Глубина, м',
+            inverse: true,
+            data: depthData.map(item => item.depth),
+            axisLabel: {
+                formatter: '{value} м'
+            }
+        },
+        visualMap: {
+            type: 'piecewise',
+            categories: Object.keys(lithologyColors),
+            dimension: 'lithology',
+            inRange: {
+                color: Object.values(lithologyColors)
+            },
+            top: 60,
+            right: 10,
+            textStyle: {
+                color: '#333'
+            }
+        },
+        series: [
+            {
+                name: 'ГК',
+                type: 'bar',
+                data: depthData.map(item => ({
+                    value: [item.gk, item.depth],
+                    itemStyle: { color: '#d62728' },
+                    lithology: item.lithology,
+                    a_o: item.a_o,
+                    depth: item.depth,
+                    nk: item.nk,
+                    ps: item.ps,
+                    saturation: item.saturation
+                })),
+                barWidth: '40%'
+            },
+            {
+                name: 'НК',
+                type: 'bar',
+                data: depthData.map(item => ({
+                    value: [item.nk, item.depth],
+                    itemStyle: { color: '#1f77b4' },
+                    lithology: item.lithology,
+                    a_o: item.a_o,
+                    depth: item.depth,
+                    gk: item.gk,
+                    ps: item.ps,
+                    saturation: item.saturation
+                })),
+                barWidth: '40%'
+            },
+            {
+                name: 'ПС',
+                type: 'bar',
+                data: depthData.map(item => ({
+                    value: [item.ps, item.depth],
+                    itemStyle: { color: '#2ca02c' },
+                    lithology: item.lithology,
+                    a_o: item.a_o,
+                    depth: item.depth,
+                    gk: item.gk,
+                    nk: item.nk,
+                    saturation: item.saturation
+                })),
+                barWidth: '40%'
+            },
+            {
+                name: 'Литология',
+                type: 'scatter',
+                symbolSize: 0,
+                data: depthData.map(item => ({
+                    value: [0, item.depth],
+                    itemStyle: {
+                        color: lithologyColors[item.lithology] || 'transparent'
+                    },
+                    lithology: item.lithology
+                })),
+                markArea: {
+                    silent: true,
+                    itemStyle: {
+                        color: function(params) {
+                            const dataIndex = params.dataIndex;
+                            return lithologyColors[depthData[dataIndex].lithology] || 'transparent';
+                        },
+                        opacity: 0.3
+                    },
+                    data: depthData.map((item, index) => {
+                        if (!item.lithology) return null;
+                        return [{
+                            yAxis: item.depth,
+                            itemStyle: { color: lithologyColors[item.lithology] }
+                        }, {
+                            yAxis: index < depthData.length - 1 ? depthData[index + 1].depth : item.depth + 30
+                        }];
+                    }).filter(Boolean)
+                }
+            }
+        ]
+    };
+
+    myChart.setOption(option);
+
+    window.addEventListener('resize', function() {
+        myChart.resize();
+    });
+</script>
+</body>
+</html>
