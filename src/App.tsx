@@ -135,18 +135,18 @@ function App() {
         <label htmlFor="2"><input id="2" onChange={onChangeEvent} type='checkbox'/> Добыча газа</label>
         <label htmlFor="3"><input id="3" onChange={onChangeEvent} type='checkbox'/> Добыча жидкости</label>
         <button onClick={onDownloadToPNG}>Скачать PNG</button>
-        {/*<DynamicChart*/}
-        {/*    ref={elementRef}*/}
-        {/*    memoizeOptions={momoizeOption}*/}
-        {/*    data={filtredData}*/}
-        {/*    render={charts =>*/}
-        {/*        (<div>{charts.map((chart, index) =>*/}
-        {/*            <div style={{marginBottom: '15px'}}*/}
-        {/*                 key={index}*/}
-        {/*                 children={chart}*/}
-        {/*            />*/}
-        {/*        )}</div>)}*/}
-        {/*/>*/}
+        <DynamicChart
+            ref={elementRef}
+            memoizeOptions={momoizeOption}
+            data={filtredData}
+            render={charts =>
+                (<div>{charts.map((chart, index) =>
+                    <div style={{marginBottom: '15px'}}
+                         key={index}
+                         children={chart}
+                    />
+                )}</div>)}
+        />
         <CorrelationWrapper/>
     </div>
 }
