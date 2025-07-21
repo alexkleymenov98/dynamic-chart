@@ -83,3 +83,5 @@ export interface IDataZoomParams {
 }
 
 export type EChartGraphic<ELEMENT> = { graphic: [{ elements: ELEMENT[] }] }
+
+export type SplitPosition = number

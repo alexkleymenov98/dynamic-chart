@@ -1,25 +1,29 @@
-import {CONNECT_LINE} from "../CorrelationChart.consts.ts";
+import {CONNECT_LINE, TABLET_PADDING} from "../CorrelationChart.consts.ts";
 import {convertLinesToElements, generateConnectLineElements} from "../CorrelationChart.utils.ts";
 import * as echarts from "echarts/core";
 import type {
     CorrelationChartOptions,
     CorrelationSplitLine, EChartGraphic,
-    GraphicComponentLooseOptionExtended
+    GraphicComponentLooseOptionExtended, SplitPosition
 } from "../CorrelationChart.types.ts";
 import type {LinkedListInstance} from "../LinkedList.ts";
 import type {RefObject} from "react";
+import {updateSplitLine} from "./calculateSplitLine.ts";
 
-export const renderSplitLines = (chartInstances: RefObject<LinkedListInstance>, splitLines: Record<string, CorrelationSplitLine[]>, options: CorrelationChartOptions) => {
+const H_LINE = 1
+
+export const renderSplitLines = (chartInstances: RefObject<LinkedListInstance>, splitLines: Record<string, CorrelationSplitLine[]>, options: CorrelationChartOptions, calcLImited: RefObject<Map<string, SplitPosition[]>>) => {
 
     let currentNode = chartInstances.current.head;
     while (currentNode) {
         const instance = currentNode.value.instance
+        const nodeName = currentNode.value.name;
         const next = currentNode.next;
         const prev = currentNode.prev;
 
         let elements = []
 
-        if (currentNode.value.name === CONNECT_LINE) {
+        if (nodeName === CONNECT_LINE) {
             elements = generateConnectLineElements(currentNode, splitLines, options)
         } else {
             elements = convertLinesToElements(splitLines?.[currentNode.value.name], instance)
@@ -36,9 +40,45 @@ export const renderSplitLines = (chartInstances: RefObject<LinkedListInstance>, 
                     ondrag: echarts.util.curry(function (dataIndex, event) {
                         newPositionY = event.offsetY - (elements[dataIndex] as GraphicComponentLooseOptionExtended<typeof elements[number]>).shape.y2;
 
+                        let offsetY = event.offsetY
 
+                        const currentIndex = Math.floor(dataIndex / 2);
+
+                        let BOTTOM_LIMIT = options.height
+                        let TOP_LIMIT = TABLET_PADDING.TOP
+
+                        const nearLines = calcLImited.current.get(nodeName) ?? []
+
+                        if (nearLines[currentIndex + 1]) {
+                            const calcPositionPixel = instance.convertToPixel({yAxisIndex: 0}, nearLines[currentIndex + 1]);
+                            BOTTOM_LIMIT = calcPositionPixel < BOTTOM_LIMIT ? calcPositionPixel : BOTTOM_LIMIT
+                        }
+
+                        if (nearLines[currentIndex - 1]) {
+                            const calcPositionPixel = instance.convertToPixel({yAxisIndex: 0}, nearLines[currentIndex - 1]);
+                            TOP_LIMIT = calcPositionPixel > TOP_LIMIT ? calcPositionPixel : TOP_LIMIT
+                        }
+
+                        // Начинаем обновление координат
+                        if (BOTTOM_LIMIT < event.offsetY) {
+                            const bottom = BOTTOM_LIMIT - H_LINE
+                            newPositionY = bottom - (elements[dataIndex] as GraphicComponentLooseOptionExtended<typeof elements[number]>).shape.y2
+                            offsetY = bottom
+                        } else if (TOP_LIMIT > event.offsetY) {
+                            const top = TOP_LIMIT - H_LINE;
+                            newPositionY = top - (elements[dataIndex] as GraphicComponentLooseOptionExtended<typeof elements[number]>).shape.y2
+                            offsetY = top;
+                        }
+
+                        // Изменяем позицию разбивки
                         (elements[dataIndex] as GraphicComponentLooseOptionExtended<typeof elements[number]>).position = [0, newPositionY];
-                        (elements[dataIndex - 1] as GraphicComponentLooseOptionExtended<typeof elements[number]>).top = event.offsetY - 20;
+                        // Изменяем позицию подписи разбивки
+                        (elements[dataIndex - 1] as GraphicComponentLooseOptionExtended<typeof elements[number]>).top = offsetY - 20;
+
+
+                        const currentValue = instance.convertFromPixel({yAxisIndex:0}, offsetY)
+
+                        calcLImited.current = updateSplitLine(calcLImited.current, nodeName, currentIndex, currentValue)
 
                         instance.setOption({graphic: {elements}})
 
@@ -51,7 +91,7 @@ export const renderSplitLines = (chartInstances: RefObject<LinkedListInstance>, 
                             const nextElements = (nextInstance.getOption() as EChartGraphic<typeof elements>).graphic[0].elements ?? [];
                             const nextIndex = Math.floor(dataIndex / 2);
 
-                            (nextElements[nextIndex] as unknown as GraphicComponentLooseOptionExtended<typeof elements[number]>).shape.y1 = event.offsetY;
+                            (nextElements[nextIndex] as unknown as GraphicComponentLooseOptionExtended<typeof elements[number]>).shape.y1 = offsetY;
 
                             nextInstance.setOption({graphic: {elements: nextElements}})
                         }
@@ -59,7 +99,7 @@ export const renderSplitLines = (chartInstances: RefObject<LinkedListInstance>, 
                         if (prevInstance) {
                             const prevElements = (prevInstance.getOption() as EChartGraphic<typeof elements>).graphic[0].elements ?? [];
                             const prevIndex = Math.floor(dataIndex / 2);
-                            (prevElements[prevIndex] as unknown as GraphicComponentLooseOptionExtended<typeof elements[number]>).shape.y2 = event.offsetY;
+                            (prevElements[prevIndex] as unknown as GraphicComponentLooseOptionExtended<typeof elements[number]>).shape.y2 = offsetY;
 
                             prevInstance.setOption({graphic: {elements: prevElements}})
                         }
