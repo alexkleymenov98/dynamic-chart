@@ -8,7 +8,8 @@ import type {
 } from './CorrelationChart.types.ts';
 import type {EChartsOption} from "echarts";
 import type {ListNode} from "./LinkedList.ts";
-import {LINE_WIDTH} from "./CorrelationChart.consts.ts";
+import {LINE_WIDTH, TABLET_PADDING} from "./CorrelationChart.consts.ts";
+import type {EChartsType} from "echarts/core";
 
 export function generateSmoothData(count: number, step: number, initialDepth: number, {min, max, fractionDigits}: {
     min: number,
@@ -127,10 +128,12 @@ export const getGisData = (count: number, step: number, initialDepth: number, {m
 }
 
 
-export const convertLinesToElements = (lines: CorrelationSplitLine[], width: number) => {
+export const convertLinesToElements = (lines: CorrelationSplitLine[], instance: EChartsType) => {
     const elements: EChartsOption['graphic'] = []
 
     for (const line of lines) {
+        const yPixel = instance.convertToPixel({yAxisIndex: 0}, Number(line.value))
+
         const configLine: typeof elements[number] = {
             name: line.name,
             id: line.id,
@@ -138,9 +141,9 @@ export const convertLinesToElements = (lines: CorrelationSplitLine[], width: num
             draggable: true,
             shape: {
                 x1: 0,
-                y1: Number(line.value),
-                x2: width,
-                y2: Number(line.value)
+                y1: yPixel,
+                x2: instance.getWidth(),
+                y2: yPixel
             },
             style: {
                 stroke: line.color,
@@ -154,10 +157,11 @@ export const convertLinesToElements = (lines: CorrelationSplitLine[], width: num
         }
         elements.push({
             type: 'text',
-            right: 5,
-            top: Number(line.value) - 20,
+            right: TABLET_PADDING.RIGHT,
+            top: yPixel - 20,
             style: {
                 text: line.name, // Текст подписи
+                fill: '#CCCCCC',
             }
         },)
         elements.push(
@@ -178,9 +182,11 @@ export const generateConnectLineElements = (node: ListNode<ListNodeInstances>, s
     if (node.prev) {
         const linesPrev = splitLines[node.prev?.value.name] ?? []
 
+        const instance = node.prev.value.instance;
+
         for (const line of linesPrev) {
             prepareData.set(line.name, {
-                prevValue: Number(line.value), nextValue: null, type: line.type, color: line.color,
+                prevValue: instance.convertToPixel({yAxisIndex: 0},Number(line.value)), nextValue: null, type: line.type, color: line.color,
             })
         }
     }
@@ -188,9 +194,11 @@ export const generateConnectLineElements = (node: ListNode<ListNodeInstances>, s
     if (node.next) {
         const linesNext = splitLines[node.next?.value.name] ?? []
 
+        const instance = node.next.value.instance;
+
         for (const line of linesNext) {
             const temp = prepareData.get(line.name) ?? {nextValue: null}
-            temp.nextValue = Number(line.value)
+            temp.nextValue = instance.convertToPixel({yAxisIndex: 0},Number(line.value))
         }
     }
 

@@ -22,8 +22,31 @@ export type TData = {
     color: string
 }
 
+export type CorrelationGrid = {
+    id: number
+}
+
+export type CorrelationXAxis = {
+    name: string
+    gridIndex: number
+}
+
+
+export type CorrelationData = {
+    name: string
+    color: string
+    data: number[][]
+    xAxisIndex: number
+    gridIndex: number
+    yAxisIndex: number
+}
+
 export type CorrelationChartData = {
     name: string
+    grids: CorrelationGrid[]
+    xAxis: CorrelationXAxis[]
+    data: CorrelationData[]
+    saturation: number[][]
 }
 
 export type CorrelationSplitLine = {
@@ -36,7 +59,7 @@ export type CorrelationSplitLine = {
 }
 
 export type CorrelationChartOptions = {
-    width: number
+    widthGrid: number
     height: number
     tabletGap: number
 }

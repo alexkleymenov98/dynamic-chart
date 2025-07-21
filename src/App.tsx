@@ -4,6 +4,7 @@ import {DynamicChart} from './components/DynamicChart'
 import {type ChangeEvent, useCallback, useMemo, useState} from "react";
 import {useDownloadToPng} from "./hooks/useDownloadToPng.ts";
 import {CorrelationWrapper} from "./components/CorrelationChart/CorrelationWrapper.tsx";
+import {CorrelationChartDev} from "./components/CorrelationChart/CorrelationChartDev.tsx";
 
 const FROM_YEAR = 2000;
 const yearData = Array.from({length: 10}, (_v, year) => {

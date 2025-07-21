@@ -2,7 +2,7 @@ import {type ReactElement, type ReactNode, useEffect, useMemo, useRef} from "rea
 import type {
     CorrelationChartData,
     CorrelationChartOptions,
-    CorrelationSplitLine,
+    CorrelationSplitLine, TFacieId,
 } from "./CorrelationChart.types.ts";
 import * as echarts from 'echarts/core';
 import type {EChartsOption} from "echarts";
@@ -17,13 +17,29 @@ import {
 import {BarChart, LineChart} from "echarts/charts";
 import {CanvasRenderer} from "echarts/renderers";
 import './CorrelationChart.css'
-import {CONNECT_LINE, DEFAULT_OPTIONS} from "./CorrelationChart.consts.ts";
+import {
+    CONNECT_LINE,
+    DEFAULT_OPTIONS,
+    TABLET_PADDING,
+    TRACK_GAP,
+    Y_AXIS_DEPTH_NAME, Y_AXIS_DEPTH_NAME_ABSOLUTE, Y_AXIS_SATURATION_NAME
+} from "./CorrelationChart.consts.ts";
 import {UniversalTransition} from "echarts/features";
 import {LinkedListInstance} from "./LinkedList.ts";
 import {
-    convertLinesToElements,
-    generateConnectLineElements,
+    facieToColor, facieToName,
 } from "./CorrelationChart.utils.ts";
+import {
+    calcYAxisWithGrid,
+    generateGrid,
+    generateSeriesBetweenGrid,
+    generateXAxis,
+    generateYAxis,
+    groupSyncYAxis
+} from "./utils";
+import {renderSpliteLines} from "./utils/renderSpliteLines.ts";
+import {generateZoom} from "./utils/generateZoom.ts";
+import type {IDataZoomParams} from "../DynamicChart/DynamicChart.types.ts";
 
 
 echarts.use([
@@ -62,10 +78,21 @@ export const CorrelationChart = ({data, render, memoizeOptions = {}, splitLines}
         , [memoizeOptions])
 
     const chartNodes = useMemo<ReactElement[]>(() => {
-
-
         return data.map((config, index): ReactElement => {
-            const {name} = config;
+            const {name, data, grids, saturation} = config;
+
+            const widthWidget = TABLET_PADDING.LEFT + options.widthGrid * grids.length + TRACK_GAP * (grids.length - 1) + TABLET_PADDING.RIGHT
+
+            const colorsValues = data.reduce<Record<string, string>>((acc, value) => ({
+                ...acc,
+                [value.name]: value.color
+            }), {})
+
+            const seriesLineBetween = generateSeriesBetweenGrid(config)
+
+            const yAxis = generateYAxis(config);
+            const syncAxisDepth = groupSyncYAxis(yAxis, Y_AXIS_DEPTH_NAME)
+            const syncAxisDepthAbsolute = groupSyncYAxis(yAxis, Y_AXIS_DEPTH_NAME_ABSOLUTE, Y_AXIS_SATURATION_NAME)
 
             return (
                 <>
@@ -82,6 +109,7 @@ export const CorrelationChart = ({data, render, memoizeOptions = {}, splitLines}
                                 const chart = echarts.init(instance);
 
                                 const option: EChartsOption = {
+                                    id: `grid-between-${index}`,
                                     grid: [
                                         {id: 'grid-between', left: 0, right: 0, top: '10%', bottom: '10%'},
                                     ],
@@ -96,7 +124,7 @@ export const CorrelationChart = ({data, render, memoizeOptions = {}, splitLines}
                     <div
                         key={name}
                         className="correlation-chart"
-                        style={{height: `${options.height}px`, width: `${options.width}px`}}
+                        style={{height: `${options.height}px`, width: `${widthWidget}px`}}
                         ref={(instance) => {
                             if (!instance) {
                                 return
@@ -104,121 +132,175 @@ export const CorrelationChart = ({data, render, memoizeOptions = {}, splitLines}
 
                             const chart = echarts.init(instance);
 
-
                             const option: EChartsOption = {
                                 animation: false,
+                                id: name,
                                 title: {
                                     text: name,
                                     left: 'center'
                                 },
-                                grid: [
-                                    {id: 'grid', left: 0, right: 0, top: '10%', bottom: '10%'}, // Область для первого графика
-                                ],
-                                xAxis: {
-                                    type: 'category',
-                                    data: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
-                                    axisLine: {
-                                        lineStyle: {
-                                            color: '#333'
-                                        }
-                                    }
-                                },
-                                yAxis: {
-                                    type: 'value',
-                                    axisLine: {
-                                        lineStyle: {
-                                            color: '#333'
-                                        }
+                                dataZoom: [
+                                    {
+                                        id: 'depth-inside-absolute',
+                                        type: 'inside',
+                                        yAxisIndex: syncAxisDepthAbsolute,
+                                        filterMode: 'none',
+                                        minSpan: 5,
                                     },
-                                    splitLine: {
-                                        lineStyle: {
-                                            color: '#eee'
+                                    {
+                                        left: 40,
+                                        type: 'slider',
+                                        show: true,
+                                        yAxisIndex: syncAxisDepthAbsolute,
+                                        id: 'dataZoomY__slider_depth_absolute',
+                                        filterMode: 'none',
+                                        handleLabel: {show: true},
+                                        dataBackground: {areaStyle: {opacity: 0}, lineStyle: {opacity: 0}},
+                                        selectedDataBackground: {areaStyle: {opacity: 0}, lineStyle: {opacity: 0}},
+                                        width: 15,
+                                        minSpan: 20,
+                                        handleIcon: 'M10 10 A5 5 0 1 0 20 10 A5 5 0 1 0 10 10',
+                                        handleSize: '80%',
+                                        handleStyle: {
+                                            color: '#fff',
+                                            shadowBlur: 3,
+                                            shadowColor: 'rgba(0, 0, 0, 0.6)',
+                                            shadowOffsetX: 1,
+                                            shadowOffsetY: 2,
+                                        },
+                                        fillerColor: 'rgba(67, 128, 255, 0.2)',
+                                        borderColor: '#ddd',
+                                        backgroundColor: '#f5f5f5',
+                                        textStyle: {color: '#333'},
+                                    },
+                                    {
+                                        id: 'depth-inside',
+                                        type: 'inside',
+                                        yAxisIndex: syncAxisDepth,
+                                        filterMode: 'none',
+                                        minSpan: 5,
+                                    },
+                                    ...generateZoom(config, options, colorsValues)
+                                ],
+                                grid: generateGrid(config, options),
+                                xAxis: generateXAxis(config, colorsValues),
+                                yAxis: generateYAxis(config),
+                                tooltip: {
+                                    trigger: 'axis',
+                                    axisPointer: {type: 'line', axis: 'y', snap: false,},
+                                    formatter: (params) => {
+                                        const depthValue = params[0]?.axisValue ?? 0;
+                                        const depth = `<div>А.О. ${depthValue}</div>`;
+
+                                        const facieValue = saturation.find(([start, facie], index) => {
+                                            if (depthValue < start) {
+                                                return false
+                                            }
+                                            const next = saturation[index + 1] ?? [];
+                                            const nextStart = next[0] ?? Infinity;
+                                            return depthValue <= nextStart;
+                                        })
+
+                                        let faciesContent = '';
+
+                                        if (facieValue) {
+                                            const facieId = facieValue[1] as TFacieId;
+                                            if (facieId !== -9999) {
+                                                const facieName = facieToName[facieId];
+                                                const marker = `<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:${facieToColor[facieId]};"></span>`
+                                                faciesContent = `<div>${marker} ${facieName}</div>`
+                                            }
                                         }
+
+                                        const curvesContent = params.filter(({seriesName}) => seriesName !== 'facies').map(({
+                                                                                                                                seriesName,
+                                                                                                                                marker,
+                                                                                                                                data
+                                                                                                                            }) => {
+                                            return `<div>${marker} ${seriesName} ${data[0]}</div>`
+                                        }).join('\n')
+
+                                        return `<div>${depth}${faciesContent}<br />${curvesContent}</div>`
                                     }
                                 },
-                                series: [{
-                                    type: 'line',
-                                    data: [120, 200, 150, 80, 70, 110, 130],
-                                    smooth: true,
-                                    symbol: 'circle', // Маркеры в виде кружков
-                                    symbolSize: 10,
+                                axisPointer: {
+                                    snap: false,
                                     lineStyle: {
-                                        color: '#5470C6',
-                                        width: 3
-                                    }
-                                }],
+                                        width: 0 // полностью отключаем линию
+                                    },
+                                    link: [{yAxisIndex: syncAxisDepthAbsolute}],
+                                },
+                                visualMap: {
+                                    type: 'piecewise',
+                                    show: false, // скрываем visualMap (он работает, но не отображается)
+                                    seriesIndex: seriesLineBetween.length + data.length - 1, // применяем ТОЛЬКО к первой серии
+                                    dimension: 'depth', // раскрашиваем по индексу точек (ось Y)
+                                    pieces: saturation.map(([start, facie], index, list) => {
+                                        const next = list[index + 1];
+                                        let lte = undefined;
+                                        if (next) {
+                                            lte = next[0];
+                                        }
+
+                                        return {
+                                            gte: start,
+                                            lte,
+                                            color: facieToColor[facie as TFacieId],
+                                        }
+                                    }),
+                                },
+                                series: [...data.map(({data, name, color, xAxisIndex, yAxisIndex, gridIndex}) => ({
+                                    large: true,
+                                    lineStyle: {color},
+                                    color,
+                                    showSymbol: false,
+                                    smooth: true,
+                                    type: 'line',
+                                    name,
+                                    data: data.map(([x, y]) => [y, x]),
+                                    xAxisIndex,
+                                    yAxisIndex: calcYAxisWithGrid(yAxisIndex, gridIndex),
+                                })),
+                                    ...seriesLineBetween] as EChartsOption['series'],
                             };
 
                             chartInstances.current.append({instance: chart, name: name})
 
-                            chart.setOption(option);
+                            chart.on('dataZoom', function (_params: unknown) {
+                                const params = _params as IDataZoomParams;
+                                const start = params.start;
+                                const end = params.end;
+                                chart.setOption({dataZoom: [{}, {}, {start, end}]});
 
+                                if (!['depth-inside-absolute', 'dataZoomY__slider_depth_absolute'].includes(params.dataZoomId)) {
+                                    return
+                                }
+
+                                const currentId = chart.id
+                                chartInstances.current.forEach((instance) => {
+                                    if (instance.id !== currentId) {
+                                        instance.dispatchAction({
+                                            type: 'dataZoom',
+                                            start,
+                                            end,
+                                            dataZoomIndex: 0,
+                                        }, {silent: true});
+                                    }
+                                })
+
+                                renderSpliteLines(chartInstances, splitLines, options)
+                            });
+
+                            chart.setOption(option);
                         }}
                     />
                 </>
             );
         });
-    }, [data, memoizeOptions])
+    }, [data, options])
 
     useEffect(() => {
-            let currentNode = chartInstances.current.head;
-            while (currentNode) {
-                const instance = currentNode.value.instance
-                const next = currentNode.next;
-                const prev = currentNode.prev;
-
-                let elements = []
-
-                if (currentNode.value.name === CONNECT_LINE) {
-                    elements = generateConnectLineElements(currentNode, splitLines, options)
-                } else {
-                    elements = convertLinesToElements(splitLines?.[currentNode.value.name], instance.getWidth())
-                }
-
-                let newPositionY = 0
-
-
-                // Перетаскиваем разбивки
-                instance.setOption({
-                    graphic: echarts.util.map(elements, function (dataItem, dataIndex) {
-                        return {
-                            ...dataItem,
-                            ondrag: echarts.util.curry(function (dataIndex, event) {
-                                newPositionY = event.offsetY - elements[dataIndex].shape.y2
-
-                                elements[dataIndex].position = [0, newPositionY]
-                                elements[dataIndex - 1].top =  event.offsetY - 20
-
-                                instance.setOption({graphic: {elements}})
-
-                                // Обновляем линию соединения разбивки
-                                const nextInstance = next?.value.instance
-                                const prevInstance = prev?.value.instance
-
-
-                                if(nextInstance){
-                                    const nextElements = nextInstance.getOption().graphic[0].elements ?? []
-                                    const nextIndex = Math.floor(dataIndex / 2)
-                                    nextElements[nextIndex].shape.y1 = event.offsetY
-
-                                    nextInstance.setOption({graphic: {elements: nextElements}})
-                                }
-
-                                if(prevInstance){
-                                    const prevElements = prevInstance.getOption().graphic[0].elements ?? []
-                                    const prevIndex = Math.floor(dataIndex / 2)
-                                    prevElements[prevIndex].shape.y2 = event.offsetY
-
-                                    prevInstance.setOption({graphic: {elements: prevElements}})
-                                }
-
-                            }, dataIndex)
-                        }
-                    })
-                })
-
-                currentNode = currentNode.next;
-            }
+            renderSpliteLines(chartInstances, splitLines, options)
         }
         ,
         [splitLines]

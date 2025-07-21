@@ -1,4 +1,6 @@
-import type { DoubleListNode, ListNodeInstances} from "./CorrelationChart.types.ts";
+import type {DoubleListNode, ListNodeInstances} from "./CorrelationChart.types.ts";
+import type {EChartsType} from "echarts/core";
+import {CONNECT_LINE} from "./CorrelationChart.consts.ts";
 
 export class ListNode<T> {
     prev: DoubleListNode<T> | null
@@ -65,6 +67,18 @@ export class LinkedListInstance extends DoubleLinkedList<ListNodeInstances> {
             currentNode = currentNode.next;
         }
         return null;
+    }
+
+    forEach(fn: (instance: EChartsType) => void) {
+        let currentNode = this.head;
+
+        while (currentNode) {
+            if(!currentNode.value.name.includes(CONNECT_LINE)){
+                fn(currentNode.value.instance)
+            }
+
+            currentNode = currentNode.next;
+        }
     }
 }
 
