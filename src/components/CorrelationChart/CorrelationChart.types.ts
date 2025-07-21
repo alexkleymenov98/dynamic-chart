@@ -13,7 +13,7 @@ export type DoubleListNode<T> = {
     next: DoubleListNode<T> | null
 }
 
-export type ListNodeInstances = {name: string, instance: EChartsType}
+export type ListNodeInstances = { name: string, instance: EChartsType }
 
 export type TData = {
     name: string
@@ -63,3 +63,23 @@ export type CorrelationChartOptions = {
     height: number
     tabletGap: number
 }
+
+export type GraphicComponentLooseOptionExtended<T extends object> = T & {
+    shape: {
+        x1: number;
+        x2: number;
+        y1: number;
+        y2: number;
+    },
+    position: [number, number]
+    top: number
+}
+
+export interface IDataZoomParams {
+    start: number;
+    end: number;
+    dataZoomId: string;
+    batch?: IDataZoomParams[];
+}
+
+export type EChartGraphic<ELEMENT> = { graphic: [{ elements: ELEMENT[] }] }

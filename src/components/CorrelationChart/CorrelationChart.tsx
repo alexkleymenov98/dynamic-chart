@@ -2,7 +2,7 @@ import {type ReactElement, type ReactNode, useEffect, useMemo, useRef} from "rea
 import type {
     CorrelationChartData,
     CorrelationChartOptions,
-    CorrelationSplitLine, TFacieId,
+    CorrelationSplitLine, IDataZoomParams, TFacieId,
 } from "./CorrelationChart.types.ts";
 import * as echarts from 'echarts/core';
 import type {EChartsOption} from "echarts";
@@ -12,7 +12,8 @@ import {
     GridComponent,
     LegendComponent,
     TitleComponent,
-    TooltipComponent
+    VisualMapComponent,
+    TooltipComponent, MarkLineComponent
 } from "echarts/components";
 import {BarChart, LineChart} from "echarts/charts";
 import {CanvasRenderer} from "echarts/renderers";
@@ -27,7 +28,7 @@ import {
 import {UniversalTransition} from "echarts/features";
 import {LinkedListInstance} from "./LinkedList.ts";
 import {
-    facieToColor, facieToName,
+    facieToColor,
 } from "./CorrelationChart.utils.ts";
 import {
     calcYAxisWithGrid,
@@ -37,9 +38,9 @@ import {
     generateYAxis,
     groupSyncYAxis
 } from "./utils";
-import {renderSpliteLines} from "./utils/renderSpliteLines.ts";
+import {renderSplitLines} from "./utils/renderSpliteLines.ts";
 import {generateZoom} from "./utils/generateZoom.ts";
-import type {IDataZoomParams} from "../DynamicChart/DynamicChart.types.ts";
+import {generateTooltip} from "./utils/generateTooltip.tsx";
 
 
 echarts.use([
@@ -54,7 +55,9 @@ echarts.use([
     CanvasRenderer,
     DataZoomInsideComponent,
     DataZoomSliderComponent,
-    UniversalTransition
+    UniversalTransition,
+    VisualMapComponent,
+    MarkLineComponent,
 ]);
 
 interface CorrelationChartProps {
@@ -185,44 +188,7 @@ export const CorrelationChart = ({data, render, memoizeOptions = {}, splitLines}
                                 grid: generateGrid(config, options),
                                 xAxis: generateXAxis(config, colorsValues),
                                 yAxis: generateYAxis(config),
-                                tooltip: {
-                                    trigger: 'axis',
-                                    axisPointer: {type: 'line', axis: 'y', snap: false,},
-                                    formatter: (params) => {
-                                        const depthValue = params[0]?.axisValue ?? 0;
-                                        const depth = `<div>А.О. ${depthValue}</div>`;
-
-                                        const facieValue = saturation.find(([start, facie], index) => {
-                                            if (depthValue < start) {
-                                                return false
-                                            }
-                                            const next = saturation[index + 1] ?? [];
-                                            const nextStart = next[0] ?? Infinity;
-                                            return depthValue <= nextStart;
-                                        })
-
-                                        let faciesContent = '';
-
-                                        if (facieValue) {
-                                            const facieId = facieValue[1] as TFacieId;
-                                            if (facieId !== -9999) {
-                                                const facieName = facieToName[facieId];
-                                                const marker = `<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:${facieToColor[facieId]};"></span>`
-                                                faciesContent = `<div>${marker} ${facieName}</div>`
-                                            }
-                                        }
-
-                                        const curvesContent = params.filter(({seriesName}) => seriesName !== 'facies').map(({
-                                                                                                                                seriesName,
-                                                                                                                                marker,
-                                                                                                                                data
-                                                                                                                            }) => {
-                                            return `<div>${marker} ${seriesName} ${data[0]}</div>`
-                                        }).join('\n')
-
-                                        return `<div>${depth}${faciesContent}<br />${curvesContent}</div>`
-                                    }
-                                },
+                                tooltip: generateTooltip(config, colorsValues),
                                 axisPointer: {
                                     snap: false,
                                     lineStyle: {
@@ -230,27 +196,29 @@ export const CorrelationChart = ({data, render, memoizeOptions = {}, splitLines}
                                     },
                                     link: [{yAxisIndex: syncAxisDepthAbsolute}],
                                 },
-                                visualMap: {
-                                    type: 'piecewise',
-                                    show: false, // скрываем visualMap (он работает, но не отображается)
-                                    seriesIndex: seriesLineBetween.length + data.length - 1, // применяем ТОЛЬКО к первой серии
-                                    dimension: 'depth', // раскрашиваем по индексу точек (ось Y)
-                                    pieces: saturation.map(([start, facie], index, list) => {
-                                        const next = list[index + 1];
-                                        let lte = undefined;
-                                        if (next) {
-                                            lte = next[0];
-                                        }
+                                visualMap: [
+                                    {
+                                        type: 'piecewise',
+                                        show: false, // скрываем visualMap (он работает, но не отображается)
+                                        dimension: 0, // Используем ось Y (значения depth) для раскраски
+                                        pieces: saturation.map(([start, facie], index, list) => {
+                                            const next = list[index + 1];
+                                            let lte = undefined;
+                                            if (next) {
+                                                lte = next[0];
+                                            }
 
-                                        return {
-                                            gte: start,
-                                            lte,
-                                            color: facieToColor[facie as TFacieId],
-                                        }
-                                    }),
-                                },
+                                            return {
+                                                gte: start,
+                                                lte,
+                                                color: facieToColor[facie as TFacieId],
+                                            }
+                                        }),
+                                    }
+                                ],
                                 series: [...data.map(({data, name, color, xAxisIndex, yAxisIndex, gridIndex}) => ({
                                     large: true,
+                                    id: name,
                                     lineStyle: {color},
                                     color,
                                     showSymbol: false,
@@ -288,7 +256,7 @@ export const CorrelationChart = ({data, render, memoizeOptions = {}, splitLines}
                                     }
                                 })
 
-                                renderSpliteLines(chartInstances, splitLines, options)
+                                renderSplitLines(chartInstances, splitLines, options)
                             });
 
                             chart.setOption(option);
@@ -300,7 +268,7 @@ export const CorrelationChart = ({data, render, memoizeOptions = {}, splitLines}
     }, [data, options])
 
     useEffect(() => {
-            renderSpliteLines(chartInstances, splitLines, options)
+            renderSplitLines(chartInstances, splitLines, options)
         }
         ,
         [splitLines]

@@ -46,6 +46,7 @@ export const generateYAxis = (data: CorrelationChartData): EChartsOption['yAxis'
             offset:60,
             name: Y_AXIS_DEPTH_NAME,
             show: i === 0,
+
         })
     }
 

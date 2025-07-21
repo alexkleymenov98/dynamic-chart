@@ -2,7 +2,7 @@ type Function = (...args: any[]) => void;
 
 interface Return<T extends Function> {
     debounced: T;
-    clear: () => void | null;
+    clear: () => void | null | number;
 }
 
 export function debounce<T extends Function>(
