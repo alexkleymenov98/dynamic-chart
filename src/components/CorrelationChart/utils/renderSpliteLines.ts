@@ -4,15 +4,15 @@ import * as echarts from "echarts/core";
 import type {
     CorrelationChartOptions,
     CorrelationSplitLine, EChartGraphic,
-    GraphicComponentLooseOptionExtended, SplitPosition
+    GraphicComponentLooseOptionExtended
 } from "../CorrelationChart.types.ts";
 import type {LinkedListInstance} from "../LinkedList.ts";
 import type {RefObject} from "react";
 import {updateSplitLine} from "./calculateSplitLine.ts";
 
-const H_LINE = 1
+const H_LINE = 3
 
-export const renderSplitLines = (chartInstances: RefObject<LinkedListInstance>, splitLines: Record<string, CorrelationSplitLine[]>, options: CorrelationChartOptions, calcLImited: RefObject<Map<string, SplitPosition[]>>) => {
+export const renderSplitLines = (chartInstances: RefObject<LinkedListInstance>, options: CorrelationChartOptions, splitLines: RefObject<Map<string, CorrelationSplitLine[]>>) => {
 
     let currentNode = chartInstances.current.head;
     while (currentNode) {
@@ -24,9 +24,9 @@ export const renderSplitLines = (chartInstances: RefObject<LinkedListInstance>, 
         let elements = []
 
         if (nodeName === CONNECT_LINE) {
-            elements = generateConnectLineElements(currentNode, splitLines, options)
+            elements = generateConnectLineElements(currentNode, splitLines.current, options)
         } else {
-            elements = convertLinesToElements(splitLines?.[currentNode.value.name], instance)
+            elements = convertLinesToElements(splitLines.current.get(currentNode.value.name) ?? [], instance)
         }
 
         let newPositionY = 0
@@ -47,15 +47,15 @@ export const renderSplitLines = (chartInstances: RefObject<LinkedListInstance>, 
                         let BOTTOM_LIMIT = options.height
                         let TOP_LIMIT = TABLET_PADDING.TOP
 
-                        const nearLines = calcLImited.current.get(nodeName) ?? []
+                        const nearLines = splitLines.current.get(nodeName) ?? []
 
                         if (nearLines[currentIndex + 1]) {
-                            const calcPositionPixel = instance.convertToPixel({yAxisIndex: 0}, nearLines[currentIndex + 1]);
+                            const calcPositionPixel = instance.convertToPixel({yAxisIndex: 0}, nearLines[currentIndex + 1].value);
                             BOTTOM_LIMIT = calcPositionPixel < BOTTOM_LIMIT ? calcPositionPixel : BOTTOM_LIMIT
                         }
 
                         if (nearLines[currentIndex - 1]) {
-                            const calcPositionPixel = instance.convertToPixel({yAxisIndex: 0}, nearLines[currentIndex - 1]);
+                            const calcPositionPixel = instance.convertToPixel({yAxisIndex: 0}, nearLines[currentIndex - 1].value);
                             TOP_LIMIT = calcPositionPixel > TOP_LIMIT ? calcPositionPixel : TOP_LIMIT
                         }
 
@@ -78,7 +78,7 @@ export const renderSplitLines = (chartInstances: RefObject<LinkedListInstance>, 
 
                         const currentValue = instance.convertFromPixel({yAxisIndex:0}, offsetY)
 
-                        calcLImited.current = updateSplitLine(calcLImited.current, nodeName, currentIndex, currentValue)
+                        splitLines.current = updateSplitLine(splitLines.current, nodeName, currentIndex, currentValue)
 
                         instance.setOption({graphic: {elements}})
 

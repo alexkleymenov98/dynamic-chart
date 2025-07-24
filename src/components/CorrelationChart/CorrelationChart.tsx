@@ -2,7 +2,7 @@ import {type ReactElement, type ReactNode, useEffect, useMemo, useRef} from "rea
 import type {
     CorrelationChartData,
     CorrelationChartOptions,
-    CorrelationSplitLine, IDataZoomParams, SplitPosition, TFacieId,
+    CorrelationSplitLine, IDataZoomParams, TFacieId,
 } from "./CorrelationChart.types.ts";
 import * as echarts from 'echarts/core';
 import type {EChartsOption} from "echarts";
@@ -74,7 +74,7 @@ export const CorrelationChart = ({data, render, memoizeOptions = {}, splitLines}
 
     const chartInstances = useRef(new LinkedListInstance())
 
-    const splitLineLimit = useRef<Map<string, SplitPosition[]>>(new Map())
+    const splitLineLimit = useRef<Map<string, CorrelationSplitLine[]>>(new Map())
 
     const options: Required<CorrelationChartOptions> = useMemo(
         () => ({
@@ -241,11 +241,11 @@ export const CorrelationChart = ({data, render, memoizeOptions = {}, splitLines}
 
                             chart.on('dataZoom', function (_params: unknown) {
                                 const params = _params as IDataZoomParams;
-                                const start = params.start;
-                                const end = params.end;
+                                const start = params.batch?.[0].start ?? params.start;
+                                const end = params.batch?.[0].end ?? params.end;
                                 chart.setOption({dataZoom: [{}, {}, {start, end}]});
 
-                                if (!['depth-inside-absolute', 'dataZoomY__slider_depth_absolute'].includes(params.dataZoomId)) {
+                                if (params.dataZoomId && params.dataZoomId.includes('dataZoomX__slider')) {
                                     return
                                 }
 
@@ -261,7 +261,7 @@ export const CorrelationChart = ({data, render, memoizeOptions = {}, splitLines}
                                     }
                                 })
 
-                                renderSplitLines(chartInstances, splitLines, options, splitLineLimit)
+                                renderSplitLines(chartInstances, options, splitLineLimit)
                             });
 
                             chart.setOption(option);
@@ -270,13 +270,13 @@ export const CorrelationChart = ({data, render, memoizeOptions = {}, splitLines}
                 </>
             );
         });
-    }, [data, options])
+    }, [data, options, splitLines, splitLineLimit])
 
     useEffect(() => {
-            renderSplitLines(chartInstances, splitLines, options, splitLineLimit)
+            renderSplitLines(chartInstances, options, splitLineLimit)
         }
         ,
-        [splitLines]
+        [options, splitLines]
     )
     ;
 

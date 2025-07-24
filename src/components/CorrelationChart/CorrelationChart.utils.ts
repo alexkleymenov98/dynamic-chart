@@ -174,14 +174,14 @@ export const convertLinesToElements = (lines: CorrelationSplitLine[], instance: 
 }
 
 
-export const generateConnectLineElements = (node: ListNode<ListNodeInstances>, splitLines: Record<string, CorrelationSplitLine[]>, options:CorrelationChartOptions) => {
+export const generateConnectLineElements = (node: ListNode<ListNodeInstances>, splitLines: Map<string, CorrelationSplitLine[]>, options:CorrelationChartOptions) => {
     const elements: EChartsOption['graphic'] = []
     const prepareData: Map<string, {
         prevValue: number | null; nextValue: number | null, type: string, color: string
     }> = new Map()
 
     if (node.prev) {
-        const linesPrev = splitLines[node.prev?.value.name] ?? []
+        const linesPrev = splitLines.get(node.prev?.value.name) ?? []
 
         const instance = node.prev.value.instance;
 
@@ -193,7 +193,7 @@ export const generateConnectLineElements = (node: ListNode<ListNodeInstances>, s
     }
 
     if (node.next) {
-        const linesNext = splitLines[node.next?.value.name] ?? []
+        const linesNext = splitLines.get(node.next?.value.name) ?? [];
 
         const instance = node.next.value.instance;
 

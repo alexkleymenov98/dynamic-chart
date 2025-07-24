@@ -114,7 +114,7 @@ const mockSplitLines: Record<string, CorrelationSplitLine[]> = {
         name: 'Кровля ПК',
         color: 'red',
         type: 'dashed',
-        value: '300',
+        value: 300,
         well: '1002',
     },
         {
@@ -122,7 +122,7 @@ const mockSplitLines: Record<string, CorrelationSplitLine[]> = {
             name: 'ПКТ_Кровля',
             color: 'blue',
             type: 'solid',
-            value: '500',
+            value: 600,
             well: '1002',
         },
         {
@@ -130,7 +130,7 @@ const mockSplitLines: Record<string, CorrelationSplitLine[]> = {
             name: 'ПК1_подошва',
             color: 'green',
             type: 'solid',
-            value: '1400',
+            value: 1400,
             well: '1002',
         },],
     "1003": [{
@@ -138,7 +138,7 @@ const mockSplitLines: Record<string, CorrelationSplitLine[]> = {
         name: 'Кровля ПК',
         color: 'red',
         type: 'dashed',
-        value: '300',
+        value: 300,
         well: '1003',
     },
         {
@@ -146,7 +146,7 @@ const mockSplitLines: Record<string, CorrelationSplitLine[]> = {
             name: 'ПКТ_Кровля',
             color: 'blue',
             type: 'solid',
-            value: '1000',
+            value: 1000,
             well: '1003',
         },
         {
@@ -154,7 +154,7 @@ const mockSplitLines: Record<string, CorrelationSplitLine[]> = {
             name: 'ПК1_подошва',
             color: 'green',
             type: 'solid',
-            value: '1500',
+            value: 1500,
             well: '1003',
         },],
     "1004": [{
@@ -162,7 +162,7 @@ const mockSplitLines: Record<string, CorrelationSplitLine[]> = {
         name: 'Кровля ПК',
         color: 'red',
         type: 'dashed',
-        value: '400',
+        value: 400,
         well: '1004',
     },
         {
@@ -170,7 +170,7 @@ const mockSplitLines: Record<string, CorrelationSplitLine[]> = {
             name: 'ПКТ_Кровля',
             color: 'blue',
             type: 'solid',
-            value: '350',
+            value: 350,
             well: '1004',
         },
         {
@@ -178,7 +178,7 @@ const mockSplitLines: Record<string, CorrelationSplitLine[]> = {
             name: 'ПК1_подошва',
             color: 'green',
             type: 'solid',
-            value: '1000',
+            value: 1000,
             well: '1004',
         },]
 }

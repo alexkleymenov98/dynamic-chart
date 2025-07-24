@@ -51,7 +51,7 @@ export type CorrelationChartData = {
 
 export type CorrelationSplitLine = {
     id: string
-    value: string
+    value: number
     name: string
     color: string
     type: string
@@ -83,5 +83,3 @@ export interface IDataZoomParams {
 }
 
 export type EChartGraphic<ELEMENT> = { graphic: [{ elements: ELEMENT[] }] }
-
-export type SplitPosition = number
