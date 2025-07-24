@@ -36,12 +36,12 @@ import {
     generateSeriesBetweenGrid,
     generateXAxis,
     generateYAxis,
-    groupSyncYAxis
+    groupSyncYAxis,
+    generateSplitLine,
+    renderSplitLines,
+    generateTooltip,
+    generateZoom,
 } from "./utils";
-import {renderSplitLines} from "./utils/renderSpliteLines.ts";
-import {generateZoom} from "./utils/generateZoom.ts";
-import {generateTooltip} from "./utils/generateTooltip.tsx";
-import {generateSplitLine} from "./utils/calculateSplitLine.ts";
 
 
 echarts.use([

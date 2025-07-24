@@ -72,7 +72,7 @@ export type GraphicComponentLooseOptionExtended<T extends object> = T & {
         y2: number;
     },
     position: [number, number]
-    top: number
+    top?: number
 }
 
 export interface IDataZoomParams {

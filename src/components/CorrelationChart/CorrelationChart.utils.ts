@@ -1,7 +1,7 @@
 import {faker} from '@faker-js/faker';
 import type {
     CorrelationChartOptions,
-    CorrelationSplitLine,
+    CorrelationSplitLine, GraphicComponentLooseOptionExtended,
     ListNodeInstances,
     TColor,
     TFacieId
@@ -135,7 +135,7 @@ export const convertLinesToElements = (lines: CorrelationSplitLine[], instance: 
     for (const line of lines) {
         const yPixel = instance.convertToPixel({yAxisIndex: 0}, Number(line.value))
 
-        const configLine: typeof elements[number] = {
+        const configLine: GraphicComponentLooseOptionExtended<typeof elements[number]> = {
             name: line.name,
             id: line.id,
             type: 'line',
@@ -146,6 +146,7 @@ export const convertLinesToElements = (lines: CorrelationSplitLine[], instance: 
                 x2: instance.getWidth(),
                 y2: yPixel
             },
+            position:[0, 0],
             style: {
                 stroke: line.color,
                 lineWidth: LINE_WIDTH,
