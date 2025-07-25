@@ -1,7 +1,7 @@
 import {type ReactElement, type ReactNode, useEffect, useMemo, useRef} from "react";
 import type {
     CorrelationChartData,
-    CorrelationChartOptions,
+    CorrelationChartOptions, CorrelationChartWithInnerOptions,
     CorrelationSplitLine, IDataZoomParams, TFacieId,
 } from "./CorrelationChart.types.ts";
 import * as echarts from 'echarts/core';
@@ -19,6 +19,7 @@ import {BarChart, LineChart} from "echarts/charts";
 import {CanvasRenderer} from "echarts/renderers";
 import './CorrelationChart.css'
 import {
+    AXIS_X_HEIGHT,
     CONNECT_LINE,
     DEFAULT_OPTIONS,
     TABLET_PADDING,
@@ -76,12 +77,37 @@ export const CorrelationChart = ({data, render, memoizeOptions = {}, splitLines}
 
     const splitLineLimit = useRef<Map<string, CorrelationSplitLine[]>>(new Map())
 
-    const options: Required<CorrelationChartOptions> = useMemo(
+    const gridPaddingTop = useMemo(() => {
+        let maxCountAxisX = 0;
+
+        for (const chartData of data) {
+            const countOnGrids = chartData.data.reduce<Record<number, number>>((acc, currentValue) => {
+                if (currentValue.gridIndex in acc) {
+                    acc[currentValue.gridIndex] = acc[currentValue.gridIndex] + 1;
+                } else {
+                    acc[currentValue.gridIndex] = 1;
+                }
+
+                return acc
+            }, {});
+
+            for (const count of Object.values(countOnGrids)) {
+                if (maxCountAxisX < count) {
+                    maxCountAxisX = count
+                }
+            }
+        }
+
+        return 20 + AXIS_X_HEIGHT * maxCountAxisX
+    }, [data])
+
+    const options: Required<CorrelationChartWithInnerOptions> = useMemo(
         () => ({
             ...DEFAULT_OPTIONS,
-            ...memoizeOptions
+            ...memoizeOptions,
+            gridPaddingTop,
         })
-        , [memoizeOptions])
+        , [gridPaddingTop, memoizeOptions])
 
     const chartNodes = useMemo<ReactElement[]>(() => {
         return data.map((config, index): ReactElement => {

@@ -4,6 +4,7 @@ import {DynamicChart} from './components/DynamicChart'
 import {type ChangeEvent, useCallback, useMemo, useState} from "react";
 import {useDownloadToPng} from "./hooks/useDownloadToPng.ts";
 import {CorrelationWrapper} from "./components/CorrelationChart/CorrelationWrapper.tsx";
+import type {IDynamicChartData} from "./components/DynamicChart/DynamicChart.types.ts";
 
 const FROM_YEAR = 2000;
 const yearData = Array.from({length: 10}, (_v, year) => {
@@ -28,7 +29,7 @@ const momoizeOption = {
     }
 }
 
-const data = [
+const data:IDynamicChartData[] = [
     {
         yAxis: [{
             id: 0,
@@ -38,7 +39,7 @@ const data = [
         name: 'Добыча нефти',
         xData: yearData,
         yData: [
-            {data: getRandomValues(yearData.length), name: 'Нефть', color: 'red', yAxisIndex: 0},
+            {data: getRandomValues(yearData.length), name: 'Нефть', color: 'red', yAxisIndex: 0, type: 'scatter'},
         ],
     },
     {

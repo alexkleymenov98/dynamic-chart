@@ -27,7 +27,7 @@ const mock: CorrelationChartData[] = [
             {
                 name: 'ПС',
                 gridIndex: 1,
-            }
+            },
         ],
         data: [{
             name: 'ГК',

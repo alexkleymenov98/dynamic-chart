@@ -7,7 +7,7 @@ import type {
     IDynamicChartOptions,
     IDynamicChartWithInnerOptions,
 } from './DynamicChart.types.ts';
-import {BarChart, LineChart} from 'echarts/charts';
+import {BarChart, LineChart, ScatterChart} from 'echarts/charts';
 import {
     DataZoomComponent,
     DataZoomInsideComponent,
@@ -39,6 +39,7 @@ echartsUse([
     CanvasRenderer,
     DataZoomInsideComponent,
     DataZoomSliderComponent,
+    ScatterChart,
 ]);
 
 const DEFAULT_OPTIONS_FOR_PROPS: Partial<IDynamicChartOptions> = {};

@@ -63,6 +63,9 @@ export type CorrelationChartOptions = {
     height: number
     tabletGap: number
 }
+export type CorrelationChartWithInnerOptions = CorrelationChartOptions & {
+    gridPaddingTop: number
+}
 
 export type GraphicComponentLooseOptionExtended<T extends object> = T & {
     shape: {

@@ -1,6 +1,6 @@
 import {faker} from '@faker-js/faker';
 import type {
-    CorrelationChartOptions,
+    CorrelationChartOptions, CorrelationChartWithInnerOptions,
     CorrelationSplitLine, GraphicComponentLooseOptionExtended,
     ListNodeInstances,
     TColor,
@@ -129,11 +129,13 @@ export const getGisData = (count: number, step: number, initialDepth: number, {m
 }
 
 
-export const convertLinesToElements = (lines: CorrelationSplitLine[], instance: EChartsType) => {
+export const convertLinesToElements = (lines: CorrelationSplitLine[], instance: EChartsType, options: CorrelationChartWithInnerOptions) => {
     const elements: EChartsOption['graphic'] = []
 
     for (const line of lines) {
         const yPixel = instance.convertToPixel({yAxisIndex: 0}, Number(line.value))
+
+        const opacity = yPixel < options.gridPaddingTop ? 0 : 1
 
         const configLine: GraphicComponentLooseOptionExtended<typeof elements[number]> = {
             name: line.name,
@@ -146,11 +148,12 @@ export const convertLinesToElements = (lines: CorrelationSplitLine[], instance: 
                 x2: instance.getWidth(),
                 y2: yPixel
             },
-            position:[0, 0],
+            position: [0, 0],
             style: {
                 stroke: line.color,
                 lineWidth: LINE_WIDTH,
                 lineDash: [],
+                opacity
             },
 
         }
@@ -162,6 +165,7 @@ export const convertLinesToElements = (lines: CorrelationSplitLine[], instance: 
             right: TABLET_PADDING.RIGHT,
             top: yPixel - 20,
             style: {
+                opacity,
                 text: line.name, // Текст подписи
                 fill: '#CCCCCC',
             }
@@ -175,7 +179,7 @@ export const convertLinesToElements = (lines: CorrelationSplitLine[], instance: 
 }
 
 
-export const generateConnectLineElements = (node: ListNode<ListNodeInstances>, splitLines: Map<string, CorrelationSplitLine[]>, options:CorrelationChartOptions) => {
+export const generateConnectLineElements = (node: ListNode<ListNodeInstances>, splitLines: Map<string, CorrelationSplitLine[]>, options: CorrelationChartOptions) => {
     const elements: EChartsOption['graphic'] = []
     const prepareData: Map<string, {
         prevValue: number | null; nextValue: number | null, type: string, color: string
@@ -188,7 +192,10 @@ export const generateConnectLineElements = (node: ListNode<ListNodeInstances>, s
 
         for (const line of linesPrev) {
             prepareData.set(line.name, {
-                prevValue: instance.convertToPixel({yAxisIndex: 0},Number(line.value)), nextValue: null, type: line.type, color: line.color,
+                prevValue: instance.convertToPixel({yAxisIndex: 0}, Number(line.value)),
+                nextValue: null,
+                type: line.type,
+                color: line.color,
             })
         }
     }
@@ -200,7 +207,7 @@ export const generateConnectLineElements = (node: ListNode<ListNodeInstances>, s
 
         for (const line of linesNext) {
             const temp = prepareData.get(line.name) ?? {nextValue: null}
-            temp.nextValue = instance.convertToPixel({yAxisIndex: 0},Number(line.value))
+            temp.nextValue = instance.convertToPixel({yAxisIndex: 0}, Number(line.value))
         }
     }
 

@@ -15,10 +15,12 @@ export const CONNECT_LINE = 'CONNECT_LINE'
 export const LINE_WIDTH = 3
 
 export const TABLET_PADDING = {
-    TOP: 150,
+    TOP: 170,
     LEFT: 100,
     RIGHT: 50,
     BOTTOM: 30,
 }
+
+export const AXIS_X_HEIGHT = 50
 
 export const TRACK_GAP = 40

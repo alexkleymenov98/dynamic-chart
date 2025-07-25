@@ -1,6 +1,6 @@
 export interface IDynamicChartYData {
   data: number[];
-  type?: 'line' | 'bar';
+  type?: 'line' | 'bar' | 'scatter';
   name?: string;
   yAxisIndex?: number;
   color?: string;

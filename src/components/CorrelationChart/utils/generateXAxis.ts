@@ -1,5 +1,6 @@
 import type {EChartsOption} from "echarts";
 import type {CorrelationChartData} from "../CorrelationChart.types.ts";
+import {AXIS_X_HEIGHT} from "../CorrelationChart.consts.ts";
 
 const DEFAULT_X_AXIS: EChartsOption['xAxis'] = {
     splitLine: {show: false},
@@ -11,20 +12,6 @@ const DEFAULT_X_AXIS: EChartsOption['xAxis'] = {
     },
     min: 'dataMin',
     max: 'dataMax'
-    // min: (value) => {
-    //     if (!Number.isNaN(value.min)) {
-    //         return value.min
-    //     }
-    //
-    //     return 0.1
-    // },
-    // max: (value) => {
-    //     if (!Number.isNaN(value.max)) {
-    //         return value.max
-    //     }
-    //
-    //     return 1500
-    // },
 }
 
 export function generateXAxis(data: CorrelationChartData, colors: Record<string, string>): EChartsOption['xAxis'] {
@@ -47,7 +34,7 @@ export function generateXAxis(data: CorrelationChartData, colors: Record<string,
             name: axis.name,
             ...DEFAULT_X_AXIS,
             gridIndex: axis.gridIndex ?? 0,
-            offset: 10 +  50 * accumulation.get(axis.gridIndex),
+            offset: 10 +  AXIS_X_HEIGHT * accumulation.get(axis.gridIndex),
             nameTextStyle: {
                 color: colors[axis.name] ?? '#000000',
                 fontWeight: 'bold',

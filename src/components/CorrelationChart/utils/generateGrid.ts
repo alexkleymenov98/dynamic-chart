@@ -1,10 +1,13 @@
 import type {EChartsOption} from "echarts";
-import type {CorrelationChartData, CorrelationChartOptions} from "../CorrelationChart.types.ts";
+import type {
+    CorrelationChartData,
+    CorrelationChartWithInnerOptions
+} from "../CorrelationChart.types.ts";
 import {TABLET_PADDING, TRACK_GAP} from "../CorrelationChart.consts.ts";
 
 const BACKGROUND = '#F6F6F6'
 
-export const generateGrid = (data: CorrelationChartData, options: CorrelationChartOptions): EChartsOption['grid'] => {
+export const generateGrid = (data: CorrelationChartData, options: CorrelationChartWithInnerOptions): EChartsOption['grid'] => {
     const {grids} = data;
 
     const result: EChartsOption['grid'] = []
@@ -14,7 +17,7 @@ export const generateGrid = (data: CorrelationChartData, options: CorrelationCha
             id: track.id,
             width: `${options.widthGrid}px`,
             left: `${TABLET_PADDING.LEFT + options.widthGrid * index + TRACK_GAP * index}px`,
-            top: `${TABLET_PADDING.TOP}px`,
+            top: `${options.gridPaddingTop}px`,
             bottom: `${TABLET_PADDING.BOTTOM}px`,
             show: true,
             borderWidth: 0,  // Скрываем внешнюю рамку
@@ -27,7 +30,7 @@ export const generateGrid = (data: CorrelationChartData, options: CorrelationCha
     // Добавление гридов для разделительных линий
     if (countLineBetween > 0) {
         let count = 0
-        while (count < countLineBetween){
+        while (count < countLineBetween) {
             count++
 
             result.push(
@@ -35,7 +38,7 @@ export const generateGrid = (data: CorrelationChartData, options: CorrelationCha
                     id: `between-${count}`,
                     width: `${TRACK_GAP}px`,
                     left: `${TABLET_PADDING.LEFT + (count * options.widthGrid) + (TRACK_GAP * (count - 1))}px`,
-                    top: `${TABLET_PADDING.TOP}px`,
+                    top: `${options.gridPaddingTop}px`,
                     bottom: `${TABLET_PADDING.BOTTOM}px`,
                     show: true,
                     borderWidth: 0,  // Скрываем внешнюю рамку
@@ -50,7 +53,7 @@ export const generateGrid = (data: CorrelationChartData, options: CorrelationCha
             id: `saturation`,
             width: `${TABLET_PADDING.RIGHT}px`,
             right: '0px',
-            top: `${TABLET_PADDING.TOP}px`,
+            top: `${options.gridPaddingTop}px`,
             bottom: `${TABLET_PADDING.BOTTOM}px`,
             show: true,
             borderWidth: 0,  // Скрываем внешнюю рамку

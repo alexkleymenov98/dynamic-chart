@@ -1,8 +1,11 @@
-import type {CorrelationChartData, CorrelationChartOptions} from "../CorrelationChart.types.ts";
+import type {
+    CorrelationChartData,
+    CorrelationChartWithInnerOptions
+} from "../CorrelationChart.types.ts";
 import type {EChartsOption} from "echarts";
+import {AXIS_X_HEIGHT} from "../CorrelationChart.consts.ts";
 
-
-export const generateZoom = (data: CorrelationChartData, options: CorrelationChartOptions, colorsValues: Record<string, string>) => {
+export const generateZoom = (data: CorrelationChartData, options: CorrelationChartWithInnerOptions, colorsValues: Record<string, string>) => {
     const result: EChartsOption['dataZoom'] = []
 
     const {xAxis} = data
@@ -49,7 +52,7 @@ export const generateZoom = (data: CorrelationChartData, options: CorrelationCha
             borderColor: '#ddd',
             backgroundColor: '#f5f5f5',
             textStyle: {color: '#333'},
-            bottom: options.height - 140 + 50 * accumulation.get(axis.gridIndex),
+            bottom: options.height - options.gridPaddingTop + 10 + AXIS_X_HEIGHT * accumulation.get(axis.gridIndex),
         })
     }
 
