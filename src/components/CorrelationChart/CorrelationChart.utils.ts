@@ -214,7 +214,7 @@ export const generateConnectLineElements = (node: ListNode<ListNodeInstances>, s
     prepareData.forEach((value, name) => {
         const configLine: typeof elements[number] = {
             name: name,
-            id: name,
+            id: `between-${name}`,
             type: 'line',
             shape: {
                 x1: 0,

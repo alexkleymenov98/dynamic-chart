@@ -49,7 +49,6 @@ class DoubleLinkedList<T> {
     print() {
         let currentNode = this.head;
         while (currentNode) {
-            console.log(currentNode, 'node')
             currentNode = currentNode.next;
         }
 
@@ -69,12 +68,12 @@ export class LinkedListInstance extends DoubleLinkedList<ListNodeInstances> {
         return null;
     }
 
-    forEach(fn: (instance: EChartsType) => void) {
+    forEach(fn: (instance: EChartsType, name: string) => void) {
         let currentNode = this.head;
 
         while (currentNode) {
             if(!currentNode.value.name.includes(CONNECT_LINE)){
-                fn(currentNode.value.instance)
+                fn(currentNode.value.instance, currentNode.value.name)
             }
 
             currentNode = currentNode.next;

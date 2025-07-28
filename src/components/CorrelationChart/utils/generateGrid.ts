@@ -57,7 +57,7 @@ export const generateGrid = (data: CorrelationChartData, options: CorrelationCha
             bottom: `${TABLET_PADDING.BOTTOM}px`,
             show: true,
             borderWidth: 0,  // Скрываем внешнюю рамку
-            backgroundColor: '#E6E6E6',  // Фон области графика
+            backgroundColor: '#F0F0F0',  // Фон области графика
         }
     )
 

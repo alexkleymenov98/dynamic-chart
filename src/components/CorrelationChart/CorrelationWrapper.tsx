@@ -106,6 +106,53 @@ const mock: CorrelationChartData[] = [
             }
         ],
     },
+    {
+        saturation: saturationData,
+        name: '1004',
+        grids: [{
+            id: 0,
+        }, {
+            id: 1,
+        }],
+        xAxis: [{
+            name: 'ГК',
+            gridIndex: 0,
+        },
+            {
+                name: 'НК',
+                gridIndex: 0,
+            },
+            {
+                name: 'ПС',
+                gridIndex: 1,
+            },
+        ],
+        data: [{
+            name: 'ГК',
+            data: getGisData(15_000, 0.1, 1500, {min: 0.1, max: 1500, fractionDigits: 1}),
+            color: 'red',
+            xAxisIndex: 0,
+            gridIndex: 0,
+            yAxisIndex: 0,
+        },
+            {
+                name: 'НК',
+                data: getGisData(15_000, 0.1, 1500, {min: 0.1, max: 1500, fractionDigits: 1}),
+                color: 'blue',
+                xAxisIndex: 1,
+                gridIndex: 0,
+                yAxisIndex: 0,
+            },
+            {
+                name: 'ПС',
+                data: getGisData(15_000, 0.1, 1500, {min: 0.1, max: 1500, fractionDigits: 1}),
+                color: 'green',
+                xAxisIndex: 2,
+                gridIndex: 1,
+                yAxisIndex: 0,
+            }
+        ],
+    },
 ]
 
 const mockSplitLines: Record<string, CorrelationSplitLine[]> = {
@@ -126,7 +173,7 @@ const mockSplitLines: Record<string, CorrelationSplitLine[]> = {
             well: '1002',
         },
         {
-            id: 'pk1-1002',
+            id: 'pkl-1002',
             name: 'ПК1_подошва',
             color: 'green',
             type: 'solid',
@@ -150,7 +197,7 @@ const mockSplitLines: Record<string, CorrelationSplitLine[]> = {
             well: '1003',
         },
         {
-            id: 'pk1-1003',
+            id: 'pkl-1003',
             name: 'ПК1_подошва',
             color: 'green',
             type: 'solid',
@@ -170,11 +217,11 @@ const mockSplitLines: Record<string, CorrelationSplitLine[]> = {
             name: 'ПКТ_Кровля',
             color: 'blue',
             type: 'solid',
-            value: 350,
+            value: 750,
             well: '1004',
         },
         {
-            id: 'pk1-1004',
+            id: 'pkl-1004',
             name: 'ПК1_подошва',
             color: 'green',
             type: 'solid',

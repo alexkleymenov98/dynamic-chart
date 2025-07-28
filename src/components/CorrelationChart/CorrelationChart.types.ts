@@ -86,3 +86,16 @@ export interface IDataZoomParams {
 }
 
 export type EChartGraphic<ELEMENT> = { graphic: [{ elements: ELEMENT[] }] }
+
+export interface GraphicElementEvent<ELEMENT> {
+    type: string; // тип события ('click')
+    target: ELEMENT; // ссылка на графический элемент
+    event: MouseEvent; // оригинальное событие мыши
+}
+
+export interface DataZoomOption {
+    endValue: number;
+    startValue: number;
+    end: number;
+    start: number;
+}

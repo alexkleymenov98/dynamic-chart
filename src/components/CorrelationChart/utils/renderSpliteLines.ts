@@ -3,12 +3,14 @@ import {convertLinesToElements, generateConnectLineElements} from "../Correlatio
 import * as echarts from "echarts/core";
 import type {
     CorrelationChartWithInnerOptions,
-    CorrelationSplitLine, EChartGraphic,
-    GraphicComponentLooseOptionExtended
+    CorrelationSplitLine, DataZoomOption, EChartGraphic,
+    GraphicComponentLooseOptionExtended, GraphicElementEvent
 } from "../CorrelationChart.types.ts";
 import type {LinkedListInstance} from "../LinkedList.ts";
 import type {RefObject} from "react";
 import {updateSplitLine} from "./calculateSplitLine.ts";
+import {moveSplitOnHorizontal} from "./moveSplitOnHorizontal.ts";
+import {generatePointForZoom} from "./generatePointForZoom.ts";
 
 const H_LINE = 3
 
@@ -37,6 +39,30 @@ export const renderSplitLines = (chartInstances: RefObject<LinkedListInstance>, 
             graphic: echarts.util.map(elements, function (dataItem, dataIndex) {
                 return {
                     ...dataItem,
+                    ondblclick: (params: GraphicElementEvent<typeof elements[number]>) => {
+                        const currentLine = params.target
+                        if (!currentLine.id || currentLine.id && String(currentLine.id).includes('between')) {
+                            return
+                        }
+                        const lineId = currentLine.id;
+                        const wellId = String(currentLine.id || '').match(/\d+/)?.[0] as string;
+
+                        const line = (splitLines.current.get(wellId) as CorrelationSplitLine[]).find(({id}) => lineId === id);
+
+
+                        if (line) {
+                            const currentValue = line.value;
+                            const zoom = (instance.getOption().dataZoom as DataZoomOption[])[0]
+                            instance.dispatchAction({
+                                type: 'dataZoom',
+                                ...generatePointForZoom(currentValue, zoom),
+                                dataZoomIndex: 0,
+                            }, {silent: true});
+                            moveSplitOnHorizontal(chartInstances, instance.getId(), currentValue, line.name, splitLines.current)
+                            renderSplitLines(chartInstances, options, splitLines)
+                        }
+
+                    },
                     ondrag: echarts.util.curry(function (dataIndex, event) {
                         newPositionY = event.offsetY - (elements[dataIndex] as GraphicComponentLooseOptionExtended<typeof elements[number]>).shape.y2;
 

@@ -92,7 +92,7 @@ function generateYAxis(params: IDynamicChartData, options: IDynamicChartWithInne
                 }
             });
         }
-        console.log(yAxis, 'ass')
+
         return yAxisArray;
     }
 
